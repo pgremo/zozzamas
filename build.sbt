@@ -15,7 +15,6 @@ lazy val root = project
 
     libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % "test",
-      "com.googlecode.lanterna" % "lanterna" % "3.0.3",
-      "io.reactivex.rxjava3" % "rxjava" % "3.0.6"
+      "com.googlecode.lanterna" % "lanterna" % "3.0.3"
     )
   )
