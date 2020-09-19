@@ -21,7 +21,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: jar
-        path: target/scala-0.27/zozzamas-assembly-1.0.jar
+        path: target/scala-0.27/zozzamas-assembly-0.1.0.jar
   osx:
     needs: build
     runs-on: [macos]
