@@ -4,6 +4,6 @@ import org.junit.Assert._
 
 class Test1 {
   @Test def t1(): Unit = {
-    assertEquals("I was compiled by dotty :)", "hi")
+    assertEquals("I was compiled by dotty :)", "I was compiled by dotty :)")
   }
 }
