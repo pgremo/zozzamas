@@ -37,7 +37,7 @@ jobs:
         with:
           name: jar
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-0.1.0.jar
+        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-0.1.0.jar --app-version 0.1.0
       - name: Upload dmg
         uses: actions/upload-artifact@v1
         with:
