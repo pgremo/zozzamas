@@ -18,7 +18,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Set version
-      run: ./version
+      run: version
     - name: Build base artifact
       run: sbt assembly
     - name: Upload base artifact
@@ -34,7 +34,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set version
-        run: ./version
+        run: version
       - uses: actions/setup-java@v1
         with:
           java-version: '14.0.0'
@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set version
-        run: ./version
+        run: version.cmd
       - uses: actions/setup-java@v1
         with:
           java-version: '14.0.0'
