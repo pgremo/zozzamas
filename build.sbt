@@ -1,8 +1,10 @@
+import java.util.jar.Attributes
+
 lazy val root = project
   .in(file("."))
   .settings(
     name := "zozzamas",
-    version := "0.1.0",
+    version := sys.env.getOrElse("SPECIFICATION_VERSION", "0.1.0"),
 
     scalaVersion := "0.27.0-RC1",
 
@@ -16,5 +18,11 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "com.googlecode.lanterna" % "lanterna" % "3.0.3"
-    )
+    ),
+    
+    packageOptions += 
+      Package.ManifestAttributes(
+        Attributes.Name.IMPLEMENTATION_VERSION -> sys.env.getOrElse("IMPLEMENTATION_VERSION", "0.1.0"), 
+        Attributes.Name.SPECIFICATION_VERSION -> version.value
+      )
   )

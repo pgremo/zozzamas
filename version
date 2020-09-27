@@ -1,0 +1,28 @@
+#!/bin/bash
+
+shopt -s nocasematch
+
+MAJOR=0
+MINOR=1
+PATCH=0
+while read line; do
+    if [ ! -z "$line" ]; then
+        case $line in
+            fix)
+                ((PATCH++))
+                ;;
+            feature)
+                ((MINOR++))
+                PATCH=0
+                ;;
+            break)
+                ((MAJOR++))
+                MINOR=0
+                PATCH=0
+                ;;
+        esac
+    fi
+done < <(git log --pretty=format:"%(trailers:key=change-type,valueonly,only,unfold)")
+
+echo ::set-env SPECIFICATION_VERSION=$MAJOR.$MINOR.$PATCH
+echo ::set-env IMPLEMENTATION_VERSION=$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
