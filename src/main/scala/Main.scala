@@ -52,7 +52,7 @@ class View(private val model: Model) {
 class Controller(private val model: Model, private val view: View) {
 }
 
-def start() = {
+@main def start() = {
 
   val terminal = new DefaultTerminalFactory().createTerminal
   val screen = new TerminalScreen(terminal)
@@ -64,7 +64,9 @@ def start() = {
   val controller = new Controller(model, view)
 
   // Create window to hold the panel
-  val window = new BasicWindow
+  val packageObject: Package = model.getClass().getPackage().nn
+
+  val window = new BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
   window.setCloseWindowWithEscape(true)
   window.setComponent(view.panel)
 

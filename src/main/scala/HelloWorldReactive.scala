@@ -1,4 +1,6 @@
 import java.beans.{PropertyChangeListener, PropertyChangeSupport}
+import java.util.concurrent.Flow.{Publisher, Subscriber}
+import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 
 import HelloWorldReactive.{init, update}
 import com.googlecode.lanterna.gui2.Button.Listener
@@ -6,102 +8,106 @@ import com.googlecode.lanterna.gui2._
 import com.googlecode.lanterna.screen.{Screen, TerminalScreen}
 import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 import com.googlecode.lanterna.{TerminalSize, TextColor}
-import scala.language.implicitConversions
 
+import scala.language.implicitConversions
 import scala.collection.mutable
-import scala.util.Random
+import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
 
-  given Conversion[() => Unit, Runnable] = (f) => new Runnable {
+  given Conversion[() => Unit, Runnable] = f => new Runnable {
     override def run(): Unit = f()
   }
 
+  given Conversion[Runnable => Unit, Executor] = f => new Executor {
+    override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
+  }
+
   def[T] (x: T | Null) nn: T =
-    if (x == null) throw new NullPointerException("tried to cast away nullability, but value is null")
+    if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
     else x.asInstanceOf[T]
 
-  trait EventEmitter[T] {
-    def on(f: T => Unit): Unit
+  sealed trait Msg {}
 
-    def emit(e: T): Unit
-  }
+  object Msg:
 
-  enum Msg {
+    case object None extends Msg
 
-    case None
+  type Cmd[Msg] = () => Msg
 
-    case Loading
+  object Cmd:
+    
+    val None: Cmd[Msg] = () => Msg.None
 
-    case NameCreated(forename: String, surname: String)
 
-  }
-
-  enum Cmd[Msg](val f: () => Msg) {
-
-    case None extends Cmd(() => Msg.None)
-
-    case GenerateName(forename: String, surname: String) extends Cmd(() => Msg.NameCreated(forename, surname))
-
-    def apply(): Msg = f()
-  }
-
-  class TextGuiThreadEventEmitter[T](using processor: TextGUIThread) extends EventEmitter[T] {
-    private var listeners: List[T => Unit] = Nil
-
-    override def on(f: T => Unit): Unit = listeners ::= f
-
-    override def emit(e: T): Unit = {
-      for (l <- listeners) processor.invokeLater(() => l(e))
-    }
-  }
-
-  val terminal = DefaultTerminalFactory().createTerminal
+  val terminal = DefaultTerminalFactory().createTerminal()
 
   val screen = TerminalScreen(terminal)
   screen.startScreen()
 
-  val gui = MultiWindowTextGUI(screen, new DefaultWindowManager, new EmptySpace(TextColor.ANSI.BLUE))
+  val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
 
-  given processor as TextGUIThread = gui.getGUIThread().nn
+  given publisher as SubmissionPublisher[Msg] = SubmissionPublisher[Msg](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
 
-  given emitter as EventEmitter[Msg] = TextGuiThreadEventEmitter[Msg]()
+  class Monitor(private val f: Try[Msg] => Unit)extends Subscriber[Msg] :
+    private var sub: Flow.Subscription | Null = null
+
+    override def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit =
+      sub = subscription
+      sub.nn.request(1)
+
+    override def onNext(item: Msg | UncheckedNull): Unit =
+      sub.nn.request(1)
+      f(Success(item.nn))
+
+    override def onError(throwable: Throwable | UncheckedNull): Unit = f(Failure(throwable.nn))
+
+    override def onComplete(): Unit = println("completed")
 
   def initialize(
                   init: () => (Model, Cmd[Msg]),
                   update: (Msg, Model) => (Model, Cmd[Msg]),
                   view: (Model) => Unit
-                )(using emitter: EventEmitter[Msg]): Unit = {
+                )(using emitter: SubmissionPublisher[Msg]): Unit = {
     var (model, command) = init()
 
-    emitter.on(msg => {
-      msg match {
-        case Msg.None => {
+    def proc(x: Try[Msg]): Unit = {
+      x match {
+        case Success(item) => {
+          item.nn match {
+            case Msg.None => {
+            }
+            case x => {
+              val (a, b) = update(x, model)
+              model = a
+              command = b
+              view(model)
+              emitter.submit(command())
+            }
+          }
         }
-        case x => {
-          val (a, b) = update(x, model)
-          model = a
-          command = b
-          view(model)
-          emitter.emit(command())
-        }
+        case Failure(throwable) => println(throwable)
       }
-    })
+    }
+
+    emitter.subscribe(Monitor(proc))
 
     view(model)
-    emitter.emit(command())
+    emitter.submit(command())
   }
-
 
   case class Model(forename: String, surname: String)
 
-  def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
-    msg match
-      case Msg.NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
-      case _ => (model, Cmd.None)
-  }
+  case object Loading extends Msg
 
-  class View()(using emitter: EventEmitter[Msg]) {
+  case class NameCreated(forename: String, surname: String) extends Msg
+
+  def update(msg: Msg, model: Model): (Model, Cmd[Msg]) =
+    msg match
+      case NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
+      case _ => (model, Cmd.None)
+
+  class View()(using publisher: SubmissionPublisher[Msg]):
     val panel = Panel()
     panel.setLayoutManager(new GridLayout(2))
 
@@ -113,28 +119,21 @@ object HelloWorldReactive {
     val surname = TextBox()
     panel.addComponent(surname)
 
-    panel.addComponent(new EmptySpace(new TerminalSize(0, 0)))
+    panel.addComponent(EmptySpace(new TerminalSize(0, 0)))
 
     val submit = Button("Submit", () => {
-      val a = forename.getText.nn
-      val b = surname.getText.nn
-      emitter.emit(Msg.NameCreated(a, b))
+      publisher.submit(NameCreated(forename.getText.nn, surname.getText.nn))
+      ()
     })
     panel.addComponent(submit)
 
-    def view(model: Model): Unit = {
+    def view(model: Model): Unit =
       forename.setText(model.forename)
       surname.setText(model.surname)
-    }
-  }
 
-  def generateName: Cmd[Msg] = Cmd.GenerateName("bob", "smith")
+  def init(): (Model, Cmd[Msg]) = (Model("", ""), () => NameCreated("bob", "smith"))
 
-  def init(): (Model, Cmd[Msg]) = {
-    (Model("", ""), generateName)
-  }
-
-  @main def helloWorld: Unit = {
+  def helloWorld: Unit =
     val component = View()
 
     initialize(init, update, component.view)
@@ -144,5 +143,4 @@ object HelloWorldReactive {
     window.setCloseWindowWithEscape(true)
 
     gui.addWindowAndWait(window)
-  }
 }
