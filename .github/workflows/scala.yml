@@ -25,7 +25,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: jar
-        path: target/scala-0.27/zozzamas-assembly-${{ env.build.SPECIFICATION_VERSION }}.jar
+        path: target/scala-0.27/zozzamas-assembly-${{ jobs.build.env.SPECIFICATION_VERSION }}.jar
   macos:
     needs: build
     runs-on: macOS-latest
@@ -41,12 +41,12 @@ jobs:
         with:
           name: jar
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-${{ env.build.SPECIFICATION_VERSION }}.jar --app-version ${{ env.build.SPECIFICATION_VERSION }}
+        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-${{ jobs.build.env.SPECIFICATION_VERSION }}.jar --app-version ${{ jobs.build.env.SPECIFICATION_VERSION }}
       - name: Upload dmg
         uses: actions/upload-artifact@v1
         with:
           name: dmg
-          path: Zozzamas-${{ env.build.SPECIFICATION_VERSION }}.dmg
+          path: Zozzamas-${{ jobs.build.env.SPECIFICATION_VERSION }}.dmg
   windows:
     needs: build
     runs-on: windows-latest
@@ -62,9 +62,9 @@ jobs:
         with:
           name: jar
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-${{ env.build.SPECIFICATION_VERSION }}.jar --app-version ${{ env.build.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
+        run: jpackage --name Zozzamas -i jar --main-class helloWorld --main-jar zozzamas-assembly-${{ jobs.build.env.SPECIFICATION_VERSION }}.jar --app-version ${{ jobs.build.env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
         uses: actions/upload-artifact@v1
         with:
           name: msi
-          path: Zozzamas-${{ env.build.SPECIFICATION_VERSION }}.msi
+          path: Zozzamas-${{ jobs.build.env.SPECIFICATION_VERSION }}.msi
