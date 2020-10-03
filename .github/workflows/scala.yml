@@ -24,7 +24,7 @@ jobs:
       run: cat target/version
     - name: Build base artifact
       run: sbt assembly
-    - name: Upload all artifact
+    - name: Upload all artifacts
       uses: actions/upload-artifact@v2
       with:
         name: artifacts
@@ -50,14 +50,8 @@ jobs:
           java-version: '14.0.0'
           java-package: jdk
           architecture: x64
-      - name: Download jar artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v2
-        with:
-          name: jar
-      - name: Download version artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: version
       - name: Display structure of downloaded files
         run: ls -R
       - name: Report version
