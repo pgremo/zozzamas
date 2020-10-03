@@ -21,7 +21,7 @@ jobs:
     - name: Compute version
       run: ./version
     - name: Report version
-      run: cat target/version.github
+      run: cat target/version
     - name: Build base artifact
       run: sbt assembly
     - name: Upload jar artifact
