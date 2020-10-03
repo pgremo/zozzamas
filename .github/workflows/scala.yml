@@ -35,7 +35,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jar
-        path: target/scala-0.27/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
+        path: target/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
     - name: Upload version artifact
       uses: actions/upload-artifact@v2
       with:
