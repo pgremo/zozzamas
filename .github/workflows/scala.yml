@@ -22,7 +22,7 @@ jobs:
       run: ./version
     - name: Report version
       run: cat target/version
-    - name: Build base artifact
+    - name: Build application jar
       run: sbt assembly
     - name: Upload all artifacts
       uses: actions/upload-artifact@v2
@@ -31,16 +31,6 @@ jobs:
         path: |
           target/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
           target/version
-    - name: Upload jar artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: jar
-        path: target/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
-    - name: Upload version artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: version
-        path: target/version
   macos:
     needs: build
     runs-on: macOS-latest
@@ -54,8 +44,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: artifacts
-      - name: Display structure of downloaded files
-        run: ls -R
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
@@ -74,14 +62,10 @@ jobs:
           java-version: '14.0.0'
           java-package: jdk
           architecture: x64
-      - name: Download base artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v2
         with:
-          name: jar
-      - name: Download version artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: version
+          name: artifacts
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
