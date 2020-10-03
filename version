@@ -24,5 +24,9 @@ while read line; do
     fi
 done < <(git log --pretty=format:"%(trailers:key=change-type,valueonly,only,unfold)")
 
-echo ::set-env name=SPECIFICATION_VERSION::$MAJOR.$MINOR.$PATCH
-echo ::set-env name=IMPLEMENTATION_VERSION::$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
+mkdir -p target
+
+cat <<! > target/version.github
+::set-env name=SPECIFICATION_VERSION::$MAJOR.$MINOR.$PATCH
+::set-env name=IMPLEMENTATION_VERSION::$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
+!
