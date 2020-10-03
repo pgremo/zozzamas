@@ -21,8 +21,7 @@ jobs:
     - name: Compute version
       run: ./version
     - name: Report version
-      run: |
-        cat target/version.github
+      run: cat target/version.github
     - name: Build base artifact
       run: sbt assembly
     - name: Upload jar artifact
@@ -34,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: version
-        path: target/version.github
+        path: target/version
   macos:
     needs: build
     runs-on: macOS-latest
@@ -53,8 +52,7 @@ jobs:
         with:
           name: version
       - name: Report version
-        run: |
-          cat version.github
+        run: cat version
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas -i jar --main-class start --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
@@ -80,8 +78,7 @@ jobs:
         with:
           name: version
       - name: Report version
-        run: |
-          cat version.github
+        run: cat version
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas -i jar --main-class start --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi

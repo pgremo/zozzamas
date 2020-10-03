@@ -26,7 +26,7 @@ done < <(git log --pretty=format:"%(trailers:key=change-type,valueonly,only,unfo
 
 mkdir -p target
 
-cat <<! > target/version.github
+cat <<! > target/version
 ::set-env name=SPECIFICATION_VERSION::$MAJOR.$MINOR.$PATCH
 ::set-env name=IMPLEMENTATION_VERSION::$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
 !
