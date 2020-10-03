@@ -25,12 +25,12 @@ jobs:
     - name: Build base artifact
       run: sbt assembly
     - name: Upload jar artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: jar
         path: target/scala-0.27/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
     - name: Upload version artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: version
         path: target/version
@@ -44,13 +44,15 @@ jobs:
           java-package: jdk
           architecture: x64
       - name: Download jar artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: jar
       - name: Download version artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: version
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
@@ -70,11 +72,11 @@ jobs:
           java-package: jdk
           architecture: x64
       - name: Download base artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: jar
       - name: Download version artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: version
       - name: Report version
