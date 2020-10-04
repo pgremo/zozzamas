@@ -20,7 +20,7 @@ lazy val root = project
     })
   .settings(
     artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-      artifact.name + module.revision + "-" + artifact.extension
+      s"${artifact.name}-${module.revision}.${artifact.extension}"
     },
       
     name := "zozzamas",
