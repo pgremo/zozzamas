@@ -23,13 +23,13 @@ jobs:
     - name: Report version
       run: cat target/version
     - name: Build application jar
-      run: sbt assembly
+      run: sbt stagePackage
     - name: Upload all artifacts
       uses: actions/upload-artifact@v2
       with:
         name: artifacts
         path: |
-          target/zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar
+          target/lib
           target/version
   macos:
     needs: build
@@ -47,7 +47,7 @@ jobs:
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i . --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
+        run: jpackage --name Zozzamas --input lib --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
         uses: actions/upload-artifact@v1
         with:
@@ -69,7 +69,7 @@ jobs:
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i . --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
+        run: jpackage --name Zozzamas --input lib --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
         uses: actions/upload-artifact@v1
         with:
