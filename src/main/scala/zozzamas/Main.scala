@@ -1,3 +1,5 @@
+package zozzamas
+
 import java.beans.{PropertyChangeListener, PropertyChangeSupport}
 
 import scala.collection.mutable
@@ -46,7 +48,7 @@ class View(private val model: Model) {
   val panel = new Panel()
   panel.setLayoutManager(new GridLayout(2))
 
-  panel.addComponent(Viewport(), GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true, 3, 3))
+  panel.addComponent(zozzamas.Viewport(), GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true, 3, 3))
 }
 
 class Controller(private val model: Model, private val view: View) {
