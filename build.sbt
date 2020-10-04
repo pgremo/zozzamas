@@ -19,6 +19,10 @@ lazy val root = project
       IO.copy(`mappings src->dest`)
     })
   .settings(
+    artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
+      artifact.name + module.revision + "-" + artifact.extension
+    },
+      
     name := "zozzamas",
     version := sys.env.getOrElse("SPECIFICATION_VERSION", "0.1.0"),
 
