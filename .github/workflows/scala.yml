@@ -15,7 +15,7 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-java@v1
       with:
-        java-version: '14.0.0'
+        java-version: '15.0.0'
         java-package: jdk
         architecture: x64
     - name: Compute version
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/setup-java@v1
         with:
-          java-version: '14.0.0'
+          java-version: '15.0.0'
           java-package: jdk
           architecture: x64
       - name: Download all artifacts
@@ -47,7 +47,7 @@ jobs:
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i . --main-class start --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
+        run: jpackage --name Zozzamas -i . --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
         uses: actions/upload-artifact@v1
         with:
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/setup-java@v1
         with:
-          java-version: '14.0.0'
+          java-version: '15.0.0'
           java-package: jdk
           architecture: x64
       - name: Download all artifacts
@@ -69,7 +69,7 @@ jobs:
       - name: Report version
         run: cat version
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas -i . --main-class start --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
+        run: jpackage --name Zozzamas -i . --main-jar zozzamas-assembly-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
         uses: actions/upload-artifact@v1
         with:
