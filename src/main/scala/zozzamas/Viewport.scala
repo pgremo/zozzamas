@@ -7,7 +7,7 @@ class Viewport extends AbstractInteractableComponent[Viewport]:
   override def createDefaultRenderer: InteractableRenderer[Viewport] = ViewportRenderer()
 
   class ViewportRenderer extends InteractableRenderer[Viewport]:
-    override def getCursorLocation(component: Viewport | UncheckedNull): TerminalPosition = TerminalPosition(0, 0)
+    override def getCursorLocation(component: Viewport | UncheckedNull): TerminalPosition | Null = null
 
     override def getPreferredSize(component: Viewport | UncheckedNull): TerminalSize = TerminalSize(3, 3)
 
