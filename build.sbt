@@ -40,6 +40,8 @@ lazy val root = project
       "com.googlecode.lanterna" % "lanterna" % "3.0.3"
     ),
     
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v", "-s"),
+    
     packageOptions += 
       Package.ManifestAttributes(
         Attributes.Name.IMPLEMENTATION_VERSION -> sys.env.getOrElse("IMPLEMENTATION_VERSION", "0.1.0"), 
