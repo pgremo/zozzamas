@@ -30,7 +30,7 @@ object Entities:
     }
 
     def unapply(x: Entity): (Int, Int) = (x & idMask, (x & versionMask) >> idShift)
-  
+
   extension (entity: Entity):
     def release() =
       val id = entity & idMask
