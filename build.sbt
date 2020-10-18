@@ -1,6 +1,10 @@
 import java.util.jar.Attributes
 import java.io.File
 
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := "4.1.9"
+ThisBuild / semanticdbIncludeInJar := false
+
 val stagePackageOutput = settingKey[File]("Where to copy all libs and built artifact")
 val stagePackage = taskKey[Unit]("Copy runtime dependencies and built artifact to 'stagePackageOutput'")
 
