@@ -1,37 +1,34 @@
 package zozzamas
 
 import java.util.NoSuchElementException
+
 import scala.Array.copyOf
+import scala.collection.{StrictOptimizedIterableOps, mutable}
 import scala.collection.mutable.ArrayBuffer
 
-class Storage[T]:
-  private val values = ArrayBuffer[T]()
-  private val packed = ArrayBuffer[Int]()
-  private var sparse = Array[Int | Null]()
+class Storage[T]
+  extends mutable.Map[Int, T]
+    with mutable.MapOps[Int, T, mutable.Map, Storage[T]]
+    with StrictOptimizedIterableOps[(Int, T), mutable.Iterable, Storage[T]] :
 
-  def put(key: Int, value: T) =
-    values.append(value)
-    sparse = sparse.length match {
-      case x if key + 1 > x => copyOf(sparse, key + 1)
-      case _ => sparse
-    }
-    packed.append(key)
-    sparse.update(key, packed.size - 1)
+  private val store = ArrayBuffer[T]()
+  private val index = SparseSet()
 
-  def get(key: Int): Option[T] =
-    sparse(key) match {
-      case index: Int => Some(values(index))
-      case _ => None
-    }
+  def get(key: Int): Option[T] = index.index(key).map(store)
 
-  def remove(key: Int) =
-    sparse(key) match {
-      case index: Int =>
-        values(index) = values.last
-        values.remove(values.length - 1)
-        packed(index) = packed.last
-        sparse.update(packed.last, index)
-        sparse.update(key, null)
-        packed.remove(packed.length - 1)
-      case _ => throw NoSuchElementException()
-    }
+  def iterator: Iterator[(Int, T)] = index.zip(store).iterator
+
+  def addOne(entry: (Int, T)) = entry match {
+    case (key, value) =>
+      store.append(value)
+      index.add(key)
+      this
+  }
+
+  def subtractOne(key: Int) =
+    index.index(key).map(entry => {
+      store(entry) = store.last
+      store.trimEnd(1)
+      index.remove(key)
+    })
+    this
