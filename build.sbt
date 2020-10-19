@@ -40,6 +40,9 @@ lazy val root = project
     ),
 
     libraryDependencies ++= Seq(
+      "org.junit.platform" % "junit-platform-runner" % "1.7.0" % "test",
+      "org.junit.jupiter" % "junit-jupiter-engine" % "5.7.0" % "test",
+      "org.junit.vintage" % "junit-vintage-engine" % "5.7.0" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
       "com.googlecode.lanterna" % "lanterna" % "3.0.3"
     ),
