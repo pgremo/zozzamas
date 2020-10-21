@@ -12,67 +12,59 @@ import com.googlecode.lanterna.screen.TerminalScreen
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.googlecode.lanterna.terminal.Terminal
 
-class Model {
-  private lazy val notifier = new PropertyChangeSupport(this)
 
-  def addPropertyChangeListener(property: String, pcl: PropertyChangeListener): Unit = {
-    notifier.addPropertyChangeListener(property, pcl)
-  }
-
-  def removePropertyChangeListener(pcl: PropertyChangeListener): Unit = {
-    notifier.removePropertyChangeListener(pcl)
-  }
-
-  private var _forname = ""
-
-  def forname = _forname
-
-  def forname_=(value: String): Unit = {
-    notifier.firePropertyChange("forname", _forname, value);
-    _forname = value
-    println(s"forname is set to $value")
-  }
-
-  private var _surname = ""
-
-  def surname = _surname
-
-  def surname_=(value: String): Unit = {
-    notifier.firePropertyChange("surname", _surname, value);
-    _surname = value
-    println(s"surname is set to $value")
-  }
-}
-
-class View(private val model: Model) {
+class View:
   val panel = new Panel()
   panel.setLayoutManager(new GridLayout(2))
 
-  panel.addComponent(zozzamas.Viewport(), GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true, 3, 3))
-}
+  panel.addComponent(new Label("Forename"))
+  val forename = new TextBox
+  panel.addComponent(forename)
 
-class Controller(private val model: Model, private val view: View) {
-}
+  panel.addComponent(new Label("Surname"))
+  val surname = new TextBox
+  panel.addComponent(surname)
+
+  panel.addComponent(new EmptySpace(new TerminalSize(0, 0))) // Empty space underneath labels
+
+  val submit = new Button("Submit")
+  panel.addComponent(submit)
+  submit.addListener(SubmitListener())
+
+object Option:
+  def apply[T](x: T | UncheckedNull): Option[T] = if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
+
+class SubmitListener(using namings: Storage[Naming])extends Button.Listener :
+  override def onTriggered(button: Button | UncheckedNull): Unit =
+    namings(user) = Naming(Option(view.forename.getText), Option(view.surname.getText))
+    namingsSystem()
+
+given view as View = View()
+
+val user = Entities.Entity()
+
+case class Naming(foreName: Option[String], surName: Option[String])
+
+given Namings as Storage[Naming]
+
+def namingsSystem()(using namings: Storage[Naming])(using view: View): Unit =
+  val component = namings(user)
+  view.forename.setText(component.surName.orNull)
+  view.surname.setText(component.foreName.orNull)
 
 @main def start() = {
-
-  val terminal = new DefaultTerminalFactory().createTerminal
-  val screen = new TerminalScreen(terminal)
+  val terminal = DefaultTerminalFactory().createTerminal
+  val screen = TerminalScreen(terminal)
   screen.startScreen()
 
-  val model = new Model
-  val view = new View(model)
-
-  val controller = new Controller(model, view)
+  val packageObject: Package = view.getClass().getPackage().nn
 
   // Create window to hold the panel
-  val packageObject: Package = model.getClass().getPackage().nn
-
-  val window = new BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
+  val window = BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
   window.setCloseWindowWithEscape(true)
   window.setComponent(view.panel)
 
   // Create gui and start gui
-  val gui = new MultiWindowTextGUI(screen, new DefaultWindowManager, new EmptySpace(TextColor.ANSI.BLUE))
+  val gui = MultiWindowTextGUI(screen, new DefaultWindowManager, new EmptySpace(TextColor.ANSI.BLUE))
   gui.addWindowAndWait(window)
 }

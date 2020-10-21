@@ -14,21 +14,32 @@ class Storage[T]
   private val store = ArrayBuffer[T]()
   private val index = SparseSet()
 
-  def get(key: Int): Option[T] = index.index(key).map(store)
-
-  def iterator: Iterator[(Int, T)] = index.zip(store).iterator
-
-  def addOne(entry: (Int, T)) = entry match {
-    case (key, value) =>
-      store.append(value)
-      index.add(key)
-      this
+  override def get(key: Int): Option[T] = index.index(key) match {
+    case -1 => None
+    case x => Some(store(x))
   }
 
-  def subtractOne(key: Int) =
-    index.index(key).map(entry => {
-      store(entry) = store.last
-      store.trimEnd(1)
-      index.remove(key)
-    })
-    this
+  override def iterator: Iterator[(Int, T)] = index.zip(store).iterator
+
+  override def addOne(entry: (Int, T)) = entry match {
+    case (key, value) =>
+      index.index(key) match {
+        case -1 =>
+          store.append(value)
+          index.add(key)
+          this
+        case l =>
+          store(l) = value
+          this
+      }
+  }
+
+  override def subtractOne(key: Int) =
+    index.index(key) match{
+      case -1 => this
+      case x =>
+        store(x) = store.last
+        store.trimEnd(1)
+        index.remove(key)
+        this
+    }

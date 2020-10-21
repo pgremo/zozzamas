@@ -4,7 +4,7 @@ import scala.collection.mutable.ArrayBuffer
 
 
 object Entities:
-  opaque type Entity = Int
+  type Entity = Int
 
   val idMask = 0x000FFFFF
   val versionMask = 0x7FF00000
