@@ -7,14 +7,14 @@ import scala.collection.{IterableFactoryDefaults, StrictOptimizedIterableOps, mu
 import scala.collection.mutable.{AbstractSet, ArrayBuffer}
 
 class SparseSet
-  extends AbstractSet[Int]
-    with mutable.SetOps[Int, Set, SparseSet]
-    with StrictOptimizedIterableOps[Int, Set, SparseSet] :
+  extends AbstractSet[Entity]
+    with mutable.SetOps[Entity, Set, SparseSet]
+    with StrictOptimizedIterableOps[Entity, Set, SparseSet] :
 
-  private var packed = ArrayBuffer[Int]()
-  private var sparse = Array[Int | Null]()
+  private var packed = ArrayBuffer[Entity]()
+  private var sparse = Array[Entity | Null]()
 
-  override def addOne(key: Int) =
+  override def addOne(key: Entity) =
     sparse = key + 1 match {
       case index if index > sparse.length => copyOf(sparse, index)
       case _ => sparse
@@ -28,14 +28,14 @@ class SparseSet
       case _ => this
     }
 
-  override def contains(key: Int) = sparse.length match {
-    case x if key > x => false
-    case _ => sparse(key).isInstanceOf[Int]
+  override def contains(key: Entity) = key match {
+    case x if x > sparse.length => false
+    case _ => sparse(key).isInstanceOf[Entity]
   }
 
-  override def subtractOne(key: Int) =
+  override def subtractOne(key: Entity) =
     sparse(key) match {
-      case index: Int =>
+      case index: Entity =>
         packed(index) = packed.last
         sparse(packed.last) = index
         sparse(key) = null
@@ -45,16 +45,16 @@ class SparseSet
     }
 
   override def clear(): Unit =
-    packed = ArrayBuffer[Int]()
-    sparse = Array[Int | Null]()
+    packed = ArrayBuffer[Entity]()
+    sparse = Array[Entity | Null]()
 
   override def iterator = packed.iterator
 
-  def index(key: Int): Int = key + 1 match {
+  def index(key: Entity): Entity = key match {
     case x if x > sparse.length => -1
     case _ => sparse(key) match {
       case null => -1
-      case k:Int => k
+      case k:Entity => k
     }
   }
 

@@ -34,20 +34,20 @@ class View:
 object Option:
   def apply[T](x: T | UncheckedNull): Option[T] = if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
 
-class SubmitListener(using namings: Storage[Naming])extends Button.Listener :
+class SubmitListener(using namings: mutable.Map[Entity, Naming])extends Button.Listener :
   override def onTriggered(button: Button | UncheckedNull): Unit =
     namings(user) = Naming(Option(view.forename.getText), Option(view.surname.getText))
     namingsSystem()
 
 given view as View = View()
 
-val user = Entities.Entity()
+val user = Entity()
 
 case class Naming(foreName: Option[String], surName: Option[String])
 
-given Namings as Storage[Naming]
+given namings as mutable.Map[Entity, Naming] = Storage[Naming]()
 
-def namingsSystem()(using namings: Storage[Naming])(using view: View): Unit =
+def namingsSystem()(using namings: mutable.Map[Entity, Naming])(using view: View): Unit =
   val component = namings(user)
   view.forename.setText(component.surName.orNull)
   view.surname.setText(component.foreName.orNull)
