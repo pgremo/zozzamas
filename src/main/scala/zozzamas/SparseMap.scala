@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 class SparseMap[T]
   extends mutable.Map[Int, T]
     with mutable.MapOps[Int, T, mutable.Map, SparseMap[T]]
-    with StrictOptimizedIterableOps[(Int, T), mutable.Iterable, SparseMap[T]] :
+    with StrictOptimizedIterableOps[(Int, T), mutable.Iterable, SparseMap[T]] {
 
   private val store = ArrayBuffer[T]()
   private val index = SparseSet()
@@ -35,7 +35,7 @@ class SparseMap[T]
   }
 
   override def subtractOne(key: Int) =
-    index.index(key) match{
+    index.index(key) match {
       case -1 => this
       case x =>
         store(x) = store.last
@@ -43,3 +43,4 @@ class SparseMap[T]
         index.remove(key)
         this
     }
+}

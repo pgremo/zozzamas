@@ -36,7 +36,8 @@ lazy val root = project
       "-Yexplicit-nulls",
       "-Ycheck-init",
       "-Xfatal-warnings",
-      "-deprecation"
+      "-deprecation",
+      "-noindent"
     ),
 
     libraryDependencies ++= Seq(

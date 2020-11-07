@@ -15,66 +15,72 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.googlecode.lanterna.terminal.Terminal
 
 
-object Option:
+object Option {
   def apply[T](x: T | UncheckedNull): Option[T] =
     if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
+}
 
-given Conversion[() => Unit, Runnable] = f => new Runnable :
+given Conversion[() => Unit, Runnable] = f => new Runnable {
   override def run(): Unit = f()
+}
 
-given Conversion[Runnable => Unit, Executor] = f => new Executor :
+given Conversion[Runnable => Unit, Executor] = f => new Executor {
   override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
+}
 
 def[T] (x: T | Null) nn: T =
   if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
   else x.asInstanceOf[T]
 
-object App:
+object App {
   val terminal = DefaultTerminalFactory().createTerminal()
   val screen = TerminalScreen(terminal)
   screen.startScreen()
   val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
-  
-  class View(using namings: mutable.Map[Entity, Naming]):
+
+  class View(using namings: mutable.Map[Entity, Naming]) {
     val panel = new Panel()
     panel.setLayoutManager(new GridLayout(2))
-  
+
     panel.addComponent(new Label("Forename"))
     val forename = new TextBox
     panel.addComponent(forename)
-  
+
     panel.addComponent(new Label("Surname"))
     val surname = new TextBox
     panel.addComponent(surname)
-  
+
     panel.addComponent(new EmptySpace(new TerminalSize(0, 0)))
-  
+
     val submit = new Button("Submit", () => {
       namings(user) = Naming(Option(view.forename.getText), Option(view.surname.getText))
       gui.getGUIThread().nn.invokeAndWait(() => namingsSystem())
     })
     panel.addComponent(submit)
-  
+  }
+
   given view as View = View()
-  
+
   val user = Entity()
-  
+
   case class Naming(foreName: Option[String], surName: Option[String])
-  
+
   given namings as mutable.Map[Entity, Naming] = SparseMap[Naming]()
-  
-  def namingsSystem()(using namings: mutable.Map[Entity, Naming])(using view: View): Unit =
+
+  def namingsSystem()(using namings: mutable.Map[Entity, Naming])(using view: View): Unit = {
     val component = namings(user)
     view.forename.setText(component.surName.orNull)
     view.surname.setText(component.foreName.orNull)
-  
+  }
+
   @main def start() = {
-  
+
     val packageObject: Package = view.getClass().getPackage().nn
-  
+
     val window = BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
     window.setCloseWindowWithEscape(true)
     window.setComponent(view.panel)
-  
+
     gui.addWindowAndWait(window)
   }
+}

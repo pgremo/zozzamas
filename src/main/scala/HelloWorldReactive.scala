@@ -15,11 +15,13 @@ import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
 
-  given Conversion[() => Unit, Runnable] = f => new Runnable:
+  given Conversion[() => Unit, Runnable] = f => new Runnable {
     override def run(): Unit = f()
+  }
 
-  given Conversion[Runnable => Unit, Executor] = f => new Executor:
+  given Conversion[Runnable => Unit, Executor] = f => new Executor {
     override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
+  }
 
   def[T] (x: T | Null) nn: T =
     if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
@@ -27,16 +29,17 @@ object HelloWorldReactive {
 
   sealed trait Msg {}
 
-  object Msg:
+  object Msg {
 
     case object None extends Msg
 
+  }
+
   type Cmd[Msg] = () => Msg
 
-  object Cmd:
-    
+  object Cmd {
     val None: Cmd[Msg] = () => Msg.None
-
+  }
 
   val terminal = DefaultTerminalFactory().createTerminal()
 
@@ -47,20 +50,23 @@ object HelloWorldReactive {
 
   given publisher as SubmissionPublisher[Msg] = SubmissionPublisher[Msg](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
 
-  class Monitor(private val f: Try[Msg] => Unit)extends Subscriber[Msg] :
+  class Monitor(private val f: Try[Msg] => Unit) extends Subscriber[Msg] {
     private var sub: Flow.Subscription | Null = null
 
-    override def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit =
+    override def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
       sub = subscription
       sub.nn.request(1)
+    }
 
-    override def onNext(item: Msg | UncheckedNull): Unit =
+    override def onNext(item: Msg | UncheckedNull): Unit = {
       sub.nn.request(1)
       f(Success(item.nn))
+    }
 
     override def onError(throwable: Throwable | UncheckedNull): Unit = f(Failure(throwable.nn))
 
     override def onComplete(): Unit = println("completed")
+  }
 
   def initialize(
                   init: () => (Model, Cmd[Msg]),
@@ -100,12 +106,14 @@ object HelloWorldReactive {
 
   case class NameCreated(forename: String, surname: String) extends Msg
 
-  def update(msg: Msg, model: Model): (Model, Cmd[Msg]) =
-    msg match
+  def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
+    msg match {
       case NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
       case _ => (model, Cmd.None)
+    }
+  }
 
-  class View()(using publisher: SubmissionPublisher[Msg]):
+  class View()(using publisher: SubmissionPublisher[Msg]) {
     val panel = Panel()
     panel.setLayoutManager(new GridLayout(2))
 
@@ -125,13 +133,15 @@ object HelloWorldReactive {
     })
     panel.addComponent(submit)
 
-    def view(model: Model): Unit =
+    def view(model: Model): Unit = {
       forename.setText(model.forename)
       surname.setText(model.surname)
+    }
+  }
 
   def init(): (Model, Cmd[Msg]) = (Model("", ""), () => NameCreated("bob", "smith"))
 
-  def helloWorld: Unit =
+  def helloWorld: Unit = {
     val component = View()
 
     initialize(init, update, component.view)
@@ -141,4 +151,5 @@ object HelloWorldReactive {
     window.setCloseWindowWithEscape(true)
 
     gui.addWindowAndWait(window)
+  }
 }

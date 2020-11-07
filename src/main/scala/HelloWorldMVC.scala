@@ -66,16 +66,16 @@ object HelloWorldMVC {
   }
 
   class Controller(private val model: Model, private val view: View) {
-    view.submit.addListener(((button: Button | UncheckedNull)=> {
-        model.forname = view.forename.getText match {
-          case x: String => x
-          case _ => throw NullPointerException()
-        }
-        model.surname = view.surname.getText match {
-          case x: String => x
-          case _ => throw NullPointerException()
-        }
-      }).asInstanceOf[Button.Listener])
+    view.submit.addListener(((button: Button | UncheckedNull) => {
+      model.forname = view.forename.getText match {
+        case x: String => x
+        case _ => throw NullPointerException()
+      }
+      model.surname = view.surname.getText match {
+        case x: String => x
+        case _ => throw NullPointerException()
+      }
+    }).asInstanceOf[Button.Listener])
   }
 
   def helloWorld: Unit = {

@@ -9,12 +9,12 @@ import scala.collection.mutable.{AbstractSet, ArrayBuffer}
 class SparseSet
   extends AbstractSet[Int]
     with mutable.SetOps[Int, Set, SparseSet]
-    with StrictOptimizedIterableOps[Int, Set, SparseSet] :
+    with StrictOptimizedIterableOps[Int, Set, SparseSet] {
 
   private var packed = ArrayBuffer[Int]()
   private var sparse = Array[Int | Null]()
 
-  override def addOne(key: Int) =
+  override def addOne(key: Int) = {
     sparse = key + 1 match {
       case index if index > sparse.length => copyOf(sparse, index)
       case _ => sparse
@@ -26,6 +26,7 @@ class SparseSet
         this
       case _ => this
     }
+  }
 
   override def contains(key: Int) = key match {
     case x if x > sparse.length => false
@@ -43,9 +44,10 @@ class SparseSet
       case _ => this
     }
 
-  override def clear(): Unit =
+  override def clear(): Unit = {
     packed = ArrayBuffer[Int]()
     sparse = Array[Int | Null]()
+  }
 
   override def iterator = packed.iterator
 
@@ -56,4 +58,4 @@ class SparseSet
       case k: Int => k
     }
   }
-
+}
