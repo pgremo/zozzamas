@@ -1,6 +1,8 @@
 package zozzamas
 
 import java.beans.{PropertyChangeListener, PropertyChangeSupport}
+import java.util.concurrent.Executor
+import scala.language.implicitConversions
 
 import scala.collection.mutable
 import scala.util.Random
@@ -13,58 +15,66 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.googlecode.lanterna.terminal.Terminal
 
 
-class View:
-  val panel = new Panel()
-  panel.setLayoutManager(new GridLayout(2))
-
-  panel.addComponent(new Label("Forename"))
-  val forename = new TextBox
-  panel.addComponent(forename)
-
-  panel.addComponent(new Label("Surname"))
-  val surname = new TextBox
-  panel.addComponent(surname)
-
-  panel.addComponent(new EmptySpace(new TerminalSize(0, 0))) // Empty space underneath labels
-
-  val submit = new Button("Submit")
-  panel.addComponent(submit)
-  submit.addListener(SubmitListener())
-
 object Option:
-  def apply[T](x: T | UncheckedNull): Option[T] = if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
+  def apply[T](x: T | UncheckedNull): Option[T] =
+    if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
 
-class SubmitListener(using namings: mutable.Map[Entity, Naming])extends Button.Listener :
-  override def onTriggered(button: Button | UncheckedNull): Unit =
-    namings(user) = Naming(Option(view.forename.getText), Option(view.surname.getText))
-    namingsSystem()
+given Conversion[() => Unit, Runnable] = f => new Runnable :
+  override def run(): Unit = f()
 
-given view as View = View()
+given Conversion[Runnable => Unit, Executor] = f => new Executor :
+  override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
 
-val user = Entity()
+def[T] (x: T | Null) nn: T =
+  if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
+  else x.asInstanceOf[T]
 
-case class Naming(foreName: Option[String], surName: Option[String])
-
-given namings as mutable.Map[Entity, Naming] = Storage[Naming]()
-
-def namingsSystem()(using namings: mutable.Map[Entity, Naming])(using view: View): Unit =
-  val component = namings(user)
-  view.forename.setText(component.surName.orNull)
-  view.surname.setText(component.foreName.orNull)
-
-@main def start() = {
-  val terminal = DefaultTerminalFactory().createTerminal
+object App:
+  val terminal = DefaultTerminalFactory().createTerminal()
   val screen = TerminalScreen(terminal)
   screen.startScreen()
-
-  val packageObject: Package = view.getClass().getPackage().nn
-
-  // Create window to hold the panel
-  val window = BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
-  window.setCloseWindowWithEscape(true)
-  window.setComponent(view.panel)
-
-  // Create gui and start gui
-  val gui = MultiWindowTextGUI(screen, new DefaultWindowManager, new EmptySpace(TextColor.ANSI.BLUE))
-  gui.addWindowAndWait(window)
-}
+  val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
+  
+  class View(using namings: mutable.Map[Entity, Naming]):
+    val panel = new Panel()
+    panel.setLayoutManager(new GridLayout(2))
+  
+    panel.addComponent(new Label("Forename"))
+    val forename = new TextBox
+    panel.addComponent(forename)
+  
+    panel.addComponent(new Label("Surname"))
+    val surname = new TextBox
+    panel.addComponent(surname)
+  
+    panel.addComponent(new EmptySpace(new TerminalSize(0, 0)))
+  
+    val submit = new Button("Submit", () => {
+      namings(user) = Naming(Option(view.forename.getText), Option(view.surname.getText))
+      gui.getGUIThread().nn.invokeAndWait(() => namingsSystem())
+    })
+    panel.addComponent(submit)
+  
+  given view as View = View()
+  
+  val user = Entity()
+  
+  case class Naming(foreName: Option[String], surName: Option[String])
+  
+  given namings as mutable.Map[Entity, Naming] = SparseMap[Naming]()
+  
+  def namingsSystem()(using namings: mutable.Map[Entity, Naming])(using view: View): Unit =
+    val component = namings(user)
+    view.forename.setText(component.surName.orNull)
+    view.surname.setText(component.foreName.orNull)
+  
+  @main def start() = {
+  
+    val packageObject: Package = view.getClass().getPackage().nn
+  
+    val window = BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
+    window.setCloseWindowWithEscape(true)
+    window.setComponent(view.panel)
+  
+    gui.addWindowAndWait(window)
+  }

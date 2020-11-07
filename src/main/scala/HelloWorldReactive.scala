@@ -15,13 +15,11 @@ import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
 
-  given Conversion[() => Unit, Runnable] = f => new Runnable {
+  given Conversion[() => Unit, Runnable] = f => new Runnable:
     override def run(): Unit = f()
-  }
 
-  given Conversion[Runnable => Unit, Executor] = f => new Executor {
+  given Conversion[Runnable => Unit, Executor] = f => new Executor:
     override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
-  }
 
   def[T] (x: T | Null) nn: T =
     if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")

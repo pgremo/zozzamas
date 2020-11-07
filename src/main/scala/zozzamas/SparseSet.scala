@@ -7,35 +7,34 @@ import scala.collection.{IterableFactoryDefaults, StrictOptimizedIterableOps, mu
 import scala.collection.mutable.{AbstractSet, ArrayBuffer}
 
 class SparseSet
-  extends AbstractSet[Entity]
-    with mutable.SetOps[Entity, Set, SparseSet]
-    with StrictOptimizedIterableOps[Entity, Set, SparseSet] :
+  extends AbstractSet[Int]
+    with mutable.SetOps[Int, Set, SparseSet]
+    with StrictOptimizedIterableOps[Int, Set, SparseSet] :
 
-  private var packed = ArrayBuffer[Entity]()
-  private var sparse = Array[Entity | Null]()
+  private var packed = ArrayBuffer[Int]()
+  private var sparse = Array[Int | Null]()
 
-  override def addOne(key: Entity) =
+  override def addOne(key: Int) =
     sparse = key + 1 match {
       case index if index > sparse.length => copyOf(sparse, index)
       case _ => sparse
     }
     sparse(key) match {
-      case null => {
+      case null =>
         packed.append(key)
         sparse(key) = packed.size - 1
         this
-      }
       case _ => this
     }
 
-  override def contains(key: Entity) = key match {
+  override def contains(key: Int) = key match {
     case x if x > sparse.length => false
-    case _ => sparse(key).isInstanceOf[Entity]
+    case _ => sparse(key).isInstanceOf[Int]
   }
 
-  override def subtractOne(key: Entity) =
+  override def subtractOne(key: Int) =
     sparse(key) match {
-      case index: Entity =>
+      case index: Int =>
         packed(index) = packed.last
         sparse(packed.last) = index
         sparse(key) = null
@@ -45,16 +44,16 @@ class SparseSet
     }
 
   override def clear(): Unit =
-    packed = ArrayBuffer[Entity]()
-    sparse = Array[Entity | Null]()
+    packed = ArrayBuffer[Int]()
+    sparse = Array[Int | Null]()
 
   override def iterator = packed.iterator
 
-  def index(key: Entity): Entity = key match {
+  def index(key: Int): Int = key match {
     case x if x > sparse.length => -1
     case _ => sparse(key) match {
       case null => -1
-      case k:Entity => k
+      case k: Int => k
     }
   }
 
