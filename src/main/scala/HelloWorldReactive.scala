@@ -2,6 +2,7 @@ import java.beans.{PropertyChangeListener, PropertyChangeSupport}
 import java.util.concurrent.Flow.{Publisher, Subscriber}
 import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 
+import zozzamas.{given Conversion[() => Unit, Runnable], given Conversion[Runnable => Unit, Executor]}
 import HelloWorldReactive.{init, update}
 import com.googlecode.lanterna.gui2.Button.Listener
 import com.googlecode.lanterna.gui2._
@@ -14,18 +15,6 @@ import scala.collection.mutable
 import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
-
-  given Conversion[() => Unit, Runnable] = f => new Runnable {
-    override def run(): Unit = f()
-  }
-
-  given Conversion[Runnable => Unit, Executor] = f => new Executor {
-    override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
-  }
-
-  def[T] (x: T | Null) nn: T =
-    if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
-    else x.asInstanceOf[T]
 
   sealed trait Msg {}
 

@@ -14,24 +14,6 @@ import com.googlecode.lanterna.screen.TerminalScreen
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.googlecode.lanterna.terminal.Terminal
 
-
-object Option {
-  def apply[T](x: T | UncheckedNull): Option[T] =
-    if (x.isInstanceOf[UncheckedNull]) None else Some(x.asInstanceOf[T])
-}
-
-given Conversion[() => Unit, Runnable] = f => new Runnable {
-  override def run(): Unit = f()
-}
-
-given Conversion[Runnable => Unit, Executor] = f => new Executor {
-  override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
-}
-
-def[T] (x: T | Null) nn: T =
-  if (x == null) throw NullPointerException("tried to cast away nullability, but value is null")
-  else x.asInstanceOf[T]
-
 object App {
   val terminal = DefaultTerminalFactory().createTerminal()
   val screen = TerminalScreen(terminal)
