@@ -22,7 +22,7 @@ type ComponentOf = [V] =>> V match {
 
 def extract[T <: Tuple, I <: Tuple.InverseMap[T, Storage]](t: T, i: Entity)(using Tuple.IsMappedBy[Storage][T]): I =
   t.map {
-    [M] => (m: M) => m.asInstanceOf[Storage[_]](i).asInstanceOf[ComponentOf[M]]
+    [M] => (m: M) => m.asInstanceOf[Storage[?]](i).asInstanceOf[ComponentOf[M]]
   }.asInstanceOf[I]
 
 def transform[T <: Tuple, I <: Tuple.InverseMap[T, Storage], B](
@@ -35,6 +35,12 @@ def register[C](entity: Entity, value: C)(using storage: Storage[C]): Unit = sto
 
 def get[C](entity: Entity)(using storage: Storage[C]): C = storage(entity)
 
+inline def view[T <: Tuple]: Tuple = {
+  inline erasedValue[T] match {
+    case _: EmptyTuple => EmptyTuple
+    case _: (head *: tail) => summonInline[Storage[head]] *: view[tail]
+  }
+}
 
 class RegistryTest {
   @Test def query(): Unit = {
@@ -43,6 +49,9 @@ class RegistryTest {
     register(entity1, 44)
     register(entity1, "hello")
     register(entity1, Date())
+    
+    val lookup = view[(Int, String, Date)]
+    println(lookup)
 
     val items = (intItems, stringItems, dateItems)
 
