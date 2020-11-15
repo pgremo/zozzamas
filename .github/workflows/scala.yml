@@ -20,8 +20,6 @@ jobs:
         architecture: x64
     - name: Compute version
       run: ./version
-    - name: Report version
-      run: cat target/universal/stage/version.github
     - name: Build application jar
       run: sbt stage
     - name: Upload all artifacts
@@ -45,8 +43,6 @@ jobs:
           name: artifacts
       - name: List artifacts
         run: ls -lR
-      - name: Report version
-        run: cat version.github
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
@@ -67,8 +63,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: artifacts
-      - name: Report version
-        run: cat version.github
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
