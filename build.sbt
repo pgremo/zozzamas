@@ -6,23 +6,8 @@ enablePlugins(JDKPackagerPlugin)
 
 mappings in (Compile, packageDoc) := Seq()
 
-val stagePackageOutput = settingKey[File]("Where to copy all libs and built artifact")
-val stagePackage = taskKey[Unit]("Copy runtime dependencies and built artifact to 'stagePackageOutput'")
-
 lazy val root = project
   .in(file("."))
-  .settings(
-    stagePackageOutput := baseDirectory.value / "target" / "lib",
-    stagePackage := {
-      val allLibs: List[File] = dependencyClasspath.in(Runtime).value.map(_.data).filter(_.isFile).toList
-      val buildArtifact: File = packageBin.in(Runtime).value
-      val jars: List[File] = buildArtifact :: allLibs
-      val `mappings src->dest`: List[(File, File)] = jars.map(f => (f, stagePackageOutput.value / f.getName))
-      val log = streams.value.log
-      log.info(s"Copying to ${stagePackageOutput.value}:")
-      log.info(s"${`mappings src->dest`.map(_._1).mkString("\n")}")
-      IO.copy(`mappings src->dest`)
-    })
   .settings(
     artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
       s"${artifact.name}-${module.revision}.${artifact.extension}"
