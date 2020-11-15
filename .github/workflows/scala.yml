@@ -48,7 +48,7 @@ jobs:
       - name: Report version
         run: cat version.github
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas --input lib --main-jar lib/zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
+        run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
         uses: actions/upload-artifact@v1
         with:
@@ -70,7 +70,7 @@ jobs:
       - name: Report version
         run: cat version.github
       - name: Package jar as dmg installer
-        run: jpackage --name Zozzamas --input lib --main-jar lib/zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
+        run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
         uses: actions/upload-artifact@v1
         with:
