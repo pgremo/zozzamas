@@ -24,9 +24,9 @@ while read line; do
     fi
 done < <(git log --reverse --pretty=format:"%(trailers:key=change-type,valueonly,only,unfold)")
 
-mkdir -p target
+mkdir -p target/universal/stage
 
-cat <<! > target/version
+cat <<! > target/universal/stage/version.github
 ::set-env name=SPECIFICATION_VERSION::$MAJOR.$MINOR.$PATCH
 ::set-env name=IMPLEMENTATION_VERSION::$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
 !
