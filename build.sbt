@@ -1,9 +1,10 @@
 import java.util.jar.Attributes
 import java.io.File
 
-ThisBuild / semanticdbEnabled := true
-ThisBuild / semanticdbVersion := "4.1.9"
-ThisBuild / semanticdbIncludeInJar := false
+enablePlugins(JavaAppPackaging)
+enablePlugins(JDKPackagerPlugin)
+
+mappings in (Compile, packageDoc) := Seq()
 
 val stagePackageOutput = settingKey[File]("Where to copy all libs and built artifact")
 val stagePackage = taskKey[Unit]("Copy runtime dependencies and built artifact to 'stagePackageOutput'")
@@ -46,7 +47,7 @@ lazy val root = project
       "org.junit.jupiter" % "junit-jupiter-engine" % "5.7.0" % "test",
       "org.junit.vintage" % "junit-vintage-engine" % "5.7.0" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test",
-      "com.googlecode.lanterna" % "lanterna" % "3.0.3"
+      "com.googlecode.lanterna" % "lanterna" % "3.0.4"
     ),
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v", "-s"),
