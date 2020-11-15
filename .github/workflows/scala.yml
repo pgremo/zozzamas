@@ -66,7 +66,7 @@ jobs:
         with:
           name: artifacts
       - name: Report version
-        run: cat version.github >> $GITHUB_ENV
+        run: Get-Content -Encoding utf8 version.github | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
