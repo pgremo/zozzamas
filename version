@@ -30,3 +30,5 @@ cat <<! > target/universal/stage/version.github
 echo "SPECIFICATION_VERSION=$MAJOR.$MINOR.$PATCH" >> $GITHUB_ENV
 echo "IMPLEMENTATION_VERSION=$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 !
+
+chmod +x target/universal/stage/version.github

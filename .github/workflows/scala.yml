@@ -21,7 +21,7 @@ jobs:
     - name: Compute version
       run: ./version
     - name: Report version
-      run: cat target/universal/stage/version.github
+      run: ./target/universal/stage/version.github
     - name: Build application jar
       run: sbt stage
     - name: Upload all artifacts
@@ -44,7 +44,7 @@ jobs:
         with:
           name: artifacts
       - name: Report version
-        run: cat target/universal/stage/version.github
+        run: ./version.github
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }}
       - name: Upload dmg
@@ -66,7 +66,7 @@ jobs:
         with:
           name: artifacts
       - name: Report version
-        run: cat target/universal/stage/version.github
+        run: ./version.github
       - name: Package jar as dmg installer
         run: jpackage --name Zozzamas --input lib --main-jar zozzamas.zozzamas-${{ env.SPECIFICATION_VERSION }}.jar --app-version ${{ env.SPECIFICATION_VERSION }} --type msi --win-dir-chooser
       - name: Upload msi
