@@ -21,7 +21,7 @@ jobs:
     - name: Compute version
       run: ./version
     - name: Report version
-      run: ./target/universal/stage/version.github
+      run: cat ./target/universal/stage/version.github >> $GITHUB_ENV
     - name: Build application jar
       run: sbt stage
     - name: Upload all artifacts
