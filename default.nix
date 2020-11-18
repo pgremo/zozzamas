@@ -4,6 +4,7 @@ stdenv.mkDerivation rec {
   env = buildEnv { name = name; paths = buildInputs; };
   buildInputs = [
     sbt
+    git
     jdk11
   ];
 }
