@@ -5,17 +5,11 @@ import scala.collection.mutable.Map
 
 type Storage[X] = Map[Entity, X]
 
-type ComponentOf = [V] =>> V match {
+type ComponentOf =[V] =>> V match {
     case Storage[a] => a
   }
 
-type Homogenous[T <: Tuple, H] = T match {
-    case EmptyTuple => DummyImplicit
-    case H *: t => Homogenous[t, H]
-    case ? => Nothing
-  }
-
-class View[T <: Tuple, I <: Tuple.InverseMap[T, Storage]](private val source: T)(using Homogenous[T, Storage[?]]){
+class View[T <: Tuple, I <: Tuple.InverseMap[T, Storage]](private val source: T)(using Tuple.IsMappedBy[Storage][T]) {
   def entities: Set[Entity] =
     source.productIterator
       .map(_.asInstanceOf[Map[Entity, ?]].keySet)
