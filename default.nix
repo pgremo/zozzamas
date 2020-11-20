@@ -3,8 +3,8 @@ stdenv.mkDerivation rec {
   name = "env";
   env = buildEnv { name = name; paths = buildInputs; };
   buildInputs = [
-    sbt
     git
     jdk11
+    sbt
   ];
 }

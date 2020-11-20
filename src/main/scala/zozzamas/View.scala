@@ -5,7 +5,7 @@ import scala.collection.mutable.Map
 
 type Storage[X] = Map[Entity, X]
 
-type ComponentOf =[V] =>> V match {
+type ComponentOf = [X] =>> X match {
     case Storage[a] => a
   }
 
@@ -15,12 +15,12 @@ class View[T <: Tuple, I <: Tuple.InverseMap[T, Storage]](private val source: T)
       .map(_.asInstanceOf[Map[Entity, ?]].keySet)
       .reduce(_ intersect _)
 
-  def extract(i: Entity)(using Tuple.IsMappedBy[Storage][T]): I =
-    source.map {
+  def extract(i: Entity): I =
+    source.map[ComponentOf] {
       [M] => (m: M) => m.asInstanceOf[Storage[?]](i).asInstanceOf[ComponentOf[M]]
     }.asInstanceOf[I]
 
-  def components(using Tuple.IsMappedBy[Storage][T]): Set[I] =
+  def components: Set[I] =
     entities.map(extract)
 
   def get[K <: Tuple.Union[Tuple.InverseMap[T, Storage]]](i: Entity)(using storage: Storage[K]): K =
