@@ -1,10 +1,12 @@
-with import <nixpkgs> {};
-stdenv.mkDerivation rec {
-  name = "env";
-  env = buildEnv { name = name; paths = buildInputs; };
-  buildInputs = [
+{ pkgs ? import <nixpkgs> {} }:
+
+pkgs.mkShell {
+  buildInputs = with pkgs; [
     git
     jdk11
-    sbt
+    powershell
+    (sbt.override {
+      jre = adoptopenjdk-jre-openj9-bin-11;
+    })
   ];
 }
