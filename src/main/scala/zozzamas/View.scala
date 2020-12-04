@@ -13,10 +13,10 @@ class View[T <: Tuple, I <: Tuple.InverseMap[T, Storage]](private val source: T)
   def entities: Set[Entity] =
     source.productIterator
       .map(_.asInstanceOf[Map[Entity, ?]].keySet)
-      .reduce(_ intersect _)
+      .reduce(_ & _)
 
   def extract(i: Entity): I =
-    source.map[ComponentOf] {
+    source.map {
       [M] => (m: M) => m.asInstanceOf[Storage[?]](i).asInstanceOf[ComponentOf[M]]
     }.asInstanceOf[I]
 

@@ -20,7 +20,7 @@ class SparseSet
       case _ => sparse
     }
     sparse(key) match {
-      case null =>
+      case _: Null =>
         packed.append(key)
         sparse(key) = packed.size - 1
         this
@@ -54,8 +54,8 @@ class SparseSet
   def index(key: Int): Int = key match {
     case x if x > sparse.length => -1
     case _ => sparse(key) match {
-      case null => -1
       case k: Int => k
+      case _ => -1
     }
   }
 }
