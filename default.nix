@@ -6,7 +6,7 @@ pkgs.mkShell {
     jdk11
     powershell
     (sbt.override {
-      jre = adoptopenjdk-jre-openj9-bin-11;
+      jre = jdk11;
     })
   ];
 }
