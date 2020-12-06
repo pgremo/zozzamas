@@ -67,7 +67,7 @@ object HelloWorldReactive {
           model = a
           command = b
           view(model)
-          command.foreach(x => emitter.submit(x))
+          command.foreach(emitter.submit)
         }
         case Failure(throwable) => println(throwable)
       }
@@ -76,7 +76,7 @@ object HelloWorldReactive {
     emitter.subscribe(Monitor(proc))
 
     view(model)
-    command.foreach(x => emitter.submit(x))
+    command.foreach(emitter.submit)
   }
 
   case class Model(forename: String, surname: String)
