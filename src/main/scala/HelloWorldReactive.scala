@@ -118,7 +118,7 @@ object HelloWorldReactive {
 
   def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
-  @main def helloWorld: Unit = {
+  def helloWorld: Unit = {
     val component = View()
 
     initialize(init, update, component.view)
