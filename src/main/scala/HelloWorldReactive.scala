@@ -33,45 +33,34 @@ object HelloWorldReactive {
     val None: Cmd[Nothing] = Seq.empty[Generator[Nothing]]
   }
 
-  class Monitor[M](private val f: Try[Generator[M]] => Unit) extends Subscriber[Generator[M]] {
-    private var sub: Flow.Subscription | Null = null
-
-    override def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
-      sub = subscription
-      sub.nn.request(1)
-    }
-
-    override def onNext(item: Generator[M] | UncheckedNull): Unit = {
-      sub.nn.request(1)
-      f(Success(item.nn))
-    }
-
-    override def onError(throwable: Throwable | UncheckedNull): Unit = f(Failure(throwable.nn))
-
-    override def onComplete(): Unit = println("completed")
-  }
-
   def initialize[M, D](
                   init: () => (D, Cmd[M]),
                   update: (M, D) => (D, Cmd[M]),
                   view: (D) => Unit
                 )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
     var (model, command) = init()
+    
+    emitter.subscribe(new Subscriber[Generator[M]] {
+      var sub: Flow.Subscription | Null = null
 
-    def proc(x: Try[Generator[M]]): Unit = {
-      x match {
-        case Success(item) => {
-          val (a, b) = update(item(), model)
-          model = a
-          command = b
-          view(model)
-          command.foreach(emitter.submit)
-        }
-        case Failure(throwable) => println(throwable)
+      def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
+        sub = subscription
+        sub.nn.request(1)
       }
-    }
 
-    emitter.subscribe(Monitor(proc))
+      def onNext(item: Generator[M] | UncheckedNull): Unit = {
+        sub.nn.request(1)
+        val (a, b) = update(item(), model)
+        model = a
+        command = b
+        view(model)
+        command.foreach(emitter.submit)
+      }
+
+      def onError(throwable: Throwable | UncheckedNull): Unit = {}
+
+      def onComplete(): Unit = {}
+    })
 
     view(model)
     command.foreach(emitter.submit)
