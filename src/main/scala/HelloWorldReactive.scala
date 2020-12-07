@@ -16,14 +16,6 @@ import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
 
-  type Generator[M] = () => M
-
-  type Cmd[M] = Seq[Generator[M]]
-
-  object Cmd {
-    val None: Cmd[Nothing] = Seq.empty[Generator[Nothing]]
-  }
-
   val terminal = DefaultTerminalFactory().createTerminal()
 
   val screen = TerminalScreen(terminal)
@@ -32,6 +24,14 @@ object HelloWorldReactive {
   val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
 
   given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
+
+  type Generator[M] = () => M
+
+  type Cmd[M] = Seq[Generator[M]]
+
+  object Cmd {
+    val None: Cmd[Nothing] = Seq.empty[Generator[Nothing]]
+  }
 
   class Monitor[M](private val f: Try[Generator[M]] => Unit) extends Subscriber[Generator[M]] {
     private var sub: Flow.Subscription | Null = null
@@ -118,7 +118,7 @@ object HelloWorldReactive {
 
   def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
-  @main def helloWorld: Unit = {
+  def helloWorld: Unit = {
     val component = View()
 
     initialize(init, update, component.view)
