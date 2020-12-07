@@ -1,20 +1,20 @@
-import java.beans.{PropertyChangeListener, PropertyChangeSupport}
-import java.util.concurrent.Flow.{Publisher, Subscriber}
-import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
+package zozzamas
 
-import zozzamas.{given Conversion[() => Unit, Runnable], given Conversion[Runnable => Unit, Executor]}
-import HelloWorldReactive.{init, update}
 import com.googlecode.lanterna.gui2.Button.Listener
 import com.googlecode.lanterna.gui2._
 import com.googlecode.lanterna.screen.{Screen, TerminalScreen}
 import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 import com.googlecode.lanterna.{TerminalSize, TextColor}
+import zozzamas.App.{init, update}
 
-import scala.language.implicitConversions
+import java.beans.{PropertyChangeListener, PropertyChangeSupport}
+import java.util.concurrent.Flow.{Publisher, Subscriber}
+import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 import scala.collection.mutable
+import scala.language.implicitConversions
 import scala.util.{Failure, Random, Success, Try}
 
-object HelloWorldReactive {
+object App {
 
   val terminal = DefaultTerminalFactory().createTerminal()
 
@@ -107,12 +107,14 @@ object HelloWorldReactive {
 
   def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
-  def helloWorld: Unit = {
+  @main def start: Unit = {
     val component = View()
 
     initialize(init, update, component.view)
 
-    val window = BasicWindow()
+    val packageObject: Package = component.getClass().getPackage().nn
+
+    val window = BasicWindow(s"${packageObject.getImplementationTitle()} ${packageObject.getImplementationVersion()}")
     window.setComponent(component.panel)
     window.setCloseWindowWithEscape(true)
 
