@@ -16,14 +16,12 @@ import scala.util.{Failure, Random, Success, Try}
 
 object HelloWorldReactive {
 
-  trait Msg
-  
-  type Generator = () => Msg
+  type Generator[M] = () => M
 
-  type Cmd[Msg] = Seq[Generator]
+  type Cmd[M] = Seq[Generator[M]]
 
   object Cmd {
-    val None: Cmd[Msg] = Seq.empty[Generator]
+    val None: Cmd[Nothing] = Seq.empty[Generator[Nothing]]
   }
 
   val terminal = DefaultTerminalFactory().createTerminal()
@@ -33,9 +31,9 @@ object HelloWorldReactive {
 
   val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
 
-  given publisher as SubmissionPublisher[Generator] = SubmissionPublisher[Generator](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
+  given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
 
-  class Monitor(private val f: Try[Generator] => Unit) extends Subscriber[Generator] {
+  class Monitor[M](private val f: Try[Generator[M]] => Unit) extends Subscriber[Generator[M]] {
     private var sub: Flow.Subscription | Null = null
 
     override def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
@@ -43,7 +41,7 @@ object HelloWorldReactive {
       sub.nn.request(1)
     }
 
-    override def onNext(item: Generator | UncheckedNull): Unit = {
+    override def onNext(item: Generator[M] | UncheckedNull): Unit = {
       sub.nn.request(1)
       f(Success(item.nn))
     }
@@ -53,14 +51,14 @@ object HelloWorldReactive {
     override def onComplete(): Unit = println("completed")
   }
 
-  def initialize(
-                  init: () => (Model, Cmd[Msg]),
-                  update: (Msg, Model) => (Model, Cmd[Msg]),
+  def initialize[M, Model](
+                  init: () => (Model, Cmd[M]),
+                  update: (M, Model) => (Model, Cmd[M]),
                   view: (Model) => Unit
-                )(using emitter: SubmissionPublisher[Generator]): Unit = {
+                )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
     var (model, command) = init()
 
-    def proc(x: Try[Generator]): Unit = {
+    def proc(x: Try[Generator[M]]): Unit = {
       x match {
         case Success(item) => {
           val (a, b) = update(item(), model)
@@ -81,16 +79,18 @@ object HelloWorldReactive {
 
   case class Model(forename: String, surname: String)
 
-  case class NameCreated(forename: String, surname: String) extends Msg
+  enum Msg {
+    case NameCreated(forename: String, surname: String)
+  }
 
   def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
     msg match {
-      case NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
+      case Msg.NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
       case _ => (model, Cmd.None)
     }
   }
 
-  class View()(using publisher: SubmissionPublisher[Generator]) {
+  class View()(using publisher: SubmissionPublisher[Generator[Msg]]) {
     val panel = Panel()
     panel.setLayoutManager(new GridLayout(2))
 
@@ -105,7 +105,7 @@ object HelloWorldReactive {
     panel.addComponent(EmptySpace(new TerminalSize(0, 0)))
 
     val submit = Button("Submit", () => {
-      publisher.submit(() => NameCreated(forename.getText.nn, surname.getText.nn))
+      publisher.submit(() => Msg.NameCreated(forename.getText.nn, surname.getText.nn))
       ()
     })
     panel.addComponent(submit)
