@@ -51,10 +51,10 @@ object HelloWorldReactive {
     override def onComplete(): Unit = println("completed")
   }
 
-  def initialize[M, Model](
-                  init: () => (Model, Cmd[M]),
-                  update: (M, Model) => (Model, Cmd[M]),
-                  view: (Model) => Unit
+  def initialize[M, D](
+                  init: () => (D, Cmd[M]),
+                  update: (M, D) => (D, Cmd[M]),
+                  view: (D) => Unit
                 )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
     var (model, command) = init()
 
@@ -118,7 +118,7 @@ object HelloWorldReactive {
 
   def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
-  def helloWorld: Unit = {
+  @main def helloWorld: Unit = {
     val component = View()
 
     initialize(init, update, component.view)
