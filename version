@@ -24,7 +24,6 @@ while read line; do
     fi
 done < <(git log --reverse --pretty=format:"%(trailers:key=change-type,valueonly,only,unfold)")
 
-
 cat <<!
 SPECIFICATION_VERSION=$MAJOR.$MINOR.$PATCH
 IMPLEMENTATION_VERSION=$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
