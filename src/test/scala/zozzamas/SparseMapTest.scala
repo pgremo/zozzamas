@@ -12,6 +12,7 @@ class SparseMapTest {
   @Test def `removes associated value`() = {
     val storage = SparseMap[String]()
     storage(13) = "hello"
+    Assert.assertEquals(Some("hello"), storage.get(13))
     storage.remove(13)
     Assert.assertEquals(None, storage.get(13))
   }
