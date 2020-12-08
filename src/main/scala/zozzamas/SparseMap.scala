@@ -39,7 +39,7 @@ class SparseMap[T]
       case -1 => this
       case x =>
         store(x) = store.last
-        store.trimEnd(1)
+        store.dropRightInPlace(1)
         index.remove(key)
         this
     }

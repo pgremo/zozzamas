@@ -39,7 +39,7 @@ class SparseSet
         packed(index) = packed.last
         sparse(packed.last) = index
         sparse(key) = null
-        packed.trimEnd(1)
+        packed.dropRightInPlace(1)
         this
       case _ => this
     }
