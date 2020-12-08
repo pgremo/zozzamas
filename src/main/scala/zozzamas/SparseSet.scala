@@ -20,11 +20,11 @@ class SparseSet
       case _ => sparse
     }
     sparse(key) match {
-      case _: Null =>
+      case _: Int => this
+      case _ =>
         packed.append(key)
         sparse(key) = packed.size - 1
         this
-      case _ => this
     }
   }
 
