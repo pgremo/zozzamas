@@ -94,10 +94,7 @@ object App {
 
     panel.addComponent(EmptySpace(new TerminalSize(0, 0)))
 
-    val submit = Button("Submit", () => {
-      publisher.submit(() => Msg.NameCreated(forename.getText.nn, surname.getText.nn))
-      ()
-    })
+    val submit = Button("Submit", () => publisher.submit(() => Msg.NameCreated(forename.getText.nn, surname.getText.nn)))
     panel.addComponent(submit)
 
     def view(model: Model): Unit = {

@@ -2,7 +2,7 @@ package zozzamas
 
 import java.util.concurrent.Executor
 
-given Conversion[() => Unit, Runnable] = f => new Runnable {
+given Conversion[() => Any, Runnable] = f => new Runnable {
   override def run(): Unit = f()
 }
 

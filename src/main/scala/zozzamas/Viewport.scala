@@ -18,7 +18,6 @@ class Viewport extends AbstractInteractableComponent[Viewport] {
       }
     }
   }
-
 }
 
 object TerminalSize {
