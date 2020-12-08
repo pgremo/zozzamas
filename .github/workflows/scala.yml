@@ -23,7 +23,7 @@ jobs:
     - name: Report version
       run: cat ./target/universal/stage/version.github >> $GITHUB_ENV
     - name: Build application jar
-      run: sbt stage
+      run: sbt clean test stage
     - name: Upload all artifacts
       uses: actions/upload-artifact@v2
       with:
