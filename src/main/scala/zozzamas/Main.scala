@@ -12,7 +12,6 @@ import java.util.concurrent.Flow.{Publisher, Subscriber}
 import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 import scala.collection.mutable
 import scala.language.implicitConversions
-import scala.util.{Failure, Random, Success, Try}
 
 object App {
 
@@ -34,12 +33,12 @@ object App {
   }
 
   def initialize[M, D](
-                  init: () => (D, Cmd[M]),
-                  update: (M, D) => (D, Cmd[M]),
-                  view: (D) => Unit
-                )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
+                        init: () => (D, Cmd[M]),
+                        update: (M, D) => (D, Cmd[M]),
+                        view: (D) => Unit
+                      )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
     var (model, command) = init()
-    
+
     emitter.subscribe(new Subscriber[Generator[M]] {
       var sub: Flow.Subscription | Null = null
 
@@ -69,7 +68,9 @@ object App {
   case class Model(forename: String, surname: String)
 
   enum Msg {
+
     case NameCreated(forename: String, surname: String)
+
   }
 
   def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
