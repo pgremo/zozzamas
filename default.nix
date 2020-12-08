@@ -3,10 +3,10 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     git
-    jdk11
+    jdk14
     powershell
     (sbt.override {
-      jre = jdk11;
+      jre = jdk14;
     })
   ];
 }
