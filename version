@@ -26,7 +26,7 @@ done < <(git log --reverse --pretty=format:"%(trailers:key=change-type,valueonly
 
 mkdir -p target/universal/stage
 
-cat <<! > target/universal/stage/version.github
+cat <<!
 SPECIFICATION_VERSION=$MAJOR.$MINOR.$PATCH
 IMPLEMENTATION_VERSION=$MAJOR.$MINOR.$PATCH+$(git rev-parse --short HEAD)
 !
