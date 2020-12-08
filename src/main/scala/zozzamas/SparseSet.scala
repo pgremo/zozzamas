@@ -15,8 +15,8 @@ class SparseSet
   private var sparse = Array[Int | Null]()
 
   override def addOne(key: Int) = {
-    sparse = key + 1 match {
-      case index if index > sparse.length => copyOf(sparse, index)
+    sparse = key match {
+      case index if index >= sparse.length => copyOf(sparse, index + 1)
       case _ => sparse
     }
     sparse(key) match {
@@ -29,7 +29,7 @@ class SparseSet
   }
 
   override def contains(key: Int) = key match {
-    case x if x > sparse.length => false
+    case x if x >= sparse.length => false
     case _ => sparse(key).isInstanceOf[Int]
   }
 
@@ -52,7 +52,7 @@ class SparseSet
   override def iterator = packed.iterator
 
   def index(key: Int): Int = key match {
-    case x if x > sparse.length => -1
+    case x if x >= sparse.length => -1
     case _ => sparse(key) match {
       case k: Int => k
       case _ => -1
