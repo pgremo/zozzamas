@@ -6,6 +6,7 @@ let
     pkgs = import nixpkgs {};
 
     jdk = pkgs.jdk14;
+    sbt = (pkgs.sbt.override { jre = jdk; });
 
 in pkgs.mkShell {
 
@@ -13,9 +14,7 @@ in pkgs.mkShell {
     git
     jdk
     powershell
-    (sbt.override {
-      jre = jdk;
-    })
+    sbt
   ];
 
 }
