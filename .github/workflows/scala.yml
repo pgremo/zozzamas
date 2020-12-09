@@ -13,18 +13,21 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: actions/setup-java@v1
+    - uses: cachix/install-nix-action@v12
+    - uses: cachix/cachix-action@v8
       with:
-        java-version: '11.0.0'
-        java-package: jdk
-        architecture: x64
+        name: zozzamas
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Compute version
+      shell: nix-shell --run {0}
       run: |
         mkdir -p target/universal/stage
         ./version > ./target/universal/stage/version.env
     - name: Report version
+      shell: nix-shell --run {0}
       run: cat ./target/universal/stage/version.env >> $GITHUB_ENV
     - name: Build application jar
+      shell: nix-shell --run {0}
       run: sbt test stage
     - name: Upload all artifacts
       uses: actions/upload-artifact@v2
