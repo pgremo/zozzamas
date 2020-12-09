@@ -10,31 +10,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: cachix/install-nix-action@v12
-    - uses: cachix/cachix-action@v8
-      with:
-        name: zozzamas
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - name: Compute version
-      run: |
-        mkdir -p target/universal/stage
-        ./version > ./target/universal/stage/version.env
-      shell: nix-shell --run {0}
-    - name: Report version
-      run: cat ./target/universal/stage/version.env >> $GITHUB_ENV
-      shell: nix-shell --run {0}
-    - name: Build application jar
-      run: sbt test stage
-      shell: nix-shell --run {0}
-    - name: Upload all artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: |
-          target/universal/stage
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '14.0.0'
+          java-package: jdk
+          architecture: x64
+      - name: Compute version
+        run: |
+          mkdir -p target/universal/stage
+          ./version > ./target/universal/stage/version.env
+      - name: Report version
+        run: cat ./target/universal/stage/version.env >> $GITHUB_ENV
+      - name: Build application jar
+        run: sbt test stage
+      - name: Upload all artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: |
+            target/universal/stage
   macos:
     needs: build
     runs-on: macOS-latest
