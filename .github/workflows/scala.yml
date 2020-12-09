@@ -18,15 +18,17 @@ jobs:
       with:
         name: zozzamas
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build
     - name: Compute version
       run: |
         mkdir -p target/universal/stage
         ./version > ./target/universal/stage/version.env
+      shell nix-shell --run {0}
     - name: Report version
       run: cat ./target/universal/stage/version.env >> $GITHUB_ENV
+      shell nix-shell --run {0}
     - name: Build application jar
       run: sbt test stage
+      shell nix-shell --run {0}
     - name: Upload all artifacts
       uses: actions/upload-artifact@v2
       with:
