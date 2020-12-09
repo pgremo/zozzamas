@@ -1,5 +1,20 @@
-{ project ? import ./nix { } }:
+let
+    nixpkgs = fetchTarball {
+      url = "https://github.com/NixOS/nixpkgs/archive/3a02dc9edb283beb9580c9329f242ad705a721c3.tar.gz";
+    };
 
-project.pkgs.mkShell {
-  buildInputs = project.devTools;
+    pkgs = import nixpkgs {};
+
+    jdk = pkgs.jdk14;
+    sbt = (pkgs.sbt.override { jre = jdk; });
+
+in pkgs.mkShell {
+
+  buildInputs = with pkgs; [
+    git
+    jdk
+    powershell
+    sbt
+  ];
+
 }
