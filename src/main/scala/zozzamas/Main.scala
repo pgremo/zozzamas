@@ -1,5 +1,6 @@
 package zozzamas
 
+import com.googlecode.lanterna.bundle.LanternaThemes
 import com.googlecode.lanterna.gui2.Button.Listener
 import com.googlecode.lanterna.gui2._
 import com.googlecode.lanterna.screen.{Screen, TerminalScreen}
@@ -15,56 +16,14 @@ import scala.language.implicitConversions
 
 object App {
 
-  val terminal = DefaultTerminalFactory().createTerminal()
-
-  val screen = TerminalScreen(terminal)
+  val screen = TerminalScreen(DefaultTerminalFactory().createTerminal())
   screen.startScreen()
 
-  val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLUE))
+  val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLACK))
+  gui.setTheme(LanternaThemes.getRegisteredTheme("businessmachine"))
 
-  given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeLater(c), Flow.defaultBufferSize())
-
-  type Generator[M] = () => M
-
-  type Cmd[M] = Seq[Generator[M]]
-
-  object Cmd {
-    val None: Cmd[Nothing] = Seq.empty[Generator[Nothing]]
-  }
-
-  def initialize[M, D](
-                        init: () => (D, Cmd[M]),
-                        update: (M, D) => (D, Cmd[M]),
-                        view: (D) => Unit
-                      )(using emitter: SubmissionPublisher[Generator[M]]): Unit = {
-    var (model, command) = init()
-
-    emitter.subscribe(new Subscriber[Generator[M]] {
-      var sub: Flow.Subscription | Null = null
-
-      def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
-        sub = subscription
-        sub.nn.request(1)
-      }
-
-      def onNext(item: Generator[M] | UncheckedNull): Unit = {
-        sub.nn.request(1)
-        val (a, b) = update(item(), model)
-        model = a
-        command = b
-        view(model)
-        command.foreach(emitter.submit)
-      }
-
-      def onError(throwable: Throwable | UncheckedNull): Unit = {}
-
-      def onComplete(): Unit = {}
-    })
-
-    view(model)
-    command.foreach(emitter.submit)
-  }
-
+  given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeAndWait(c), Flow.defaultBufferSize())
+  
   case class Model(forename: String, surname: String)
 
   enum Msg {
@@ -72,6 +31,8 @@ object App {
     case NameCreated(forename: String, surname: String)
 
   }
+
+  def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
   def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
     msg match {
@@ -92,7 +53,7 @@ object App {
     val surname = TextBox()
     panel.addComponent(surname)
 
-    panel.addComponent(EmptySpace(new TerminalSize(0, 0)))
+    panel.addComponent(EmptySpace(TerminalSize.ZERO))
 
     val submit = Button("Submit", () => publisher.submit(() => Msg.NameCreated(forename.getText.nn, surname.getText.nn)))
     panel.addComponent(submit)
@@ -102,8 +63,6 @@ object App {
       surname.setText(model.surname)
     }
   }
-
-  def init(): (Model, Cmd[Msg]) = (Model("bob", "smith"), Cmd.None)
 
   @main def start: Unit = {
     val component = View()
