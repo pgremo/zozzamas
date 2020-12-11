@@ -9,7 +9,7 @@ class DynamicTitleBorder(private val f: () => String) extends AbstractBorder {
 
   override protected def createDefaultRenderer = DynamicTitleBorderRenderer()
 
-  override def toString: String = getClass.getSimpleName + "{" + getTitle + "}"
+  override def toString: String = s"${getClass.getSimpleName} {${getTitle}"
 
 }
 

@@ -17,24 +17,21 @@ import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 import scala.collection.mutable
 import scala.language.implicitConversions
 
-object App {
+object PropertyTheme {
+  def apply(name: String): PropertyTheme = {
+    var stream = classOf[AbstractTextGUI].getClassLoader.getResourceAsStream(name).nn
 
-  private def loadPropTheme(resourceFileName: String) = {
-    val properties = new Properties
-    try {
-      val classLoader = classOf[AbstractTextGUI].getClassLoader.nn
-      var resourceAsStream = classLoader.getResourceAsStream(resourceFileName)
-      if (resourceAsStream == null) resourceAsStream = new FileInputStream("src/main/resources/" + resourceFileName)
-      properties.load(resourceAsStream)
-      resourceAsStream.close()
-      properties
-    } catch {
-      case e: IOException =>
-        null
-    }
+    val properties = Properties()
+    properties.load(stream)
+
+    stream.close()
+
+    new PropertyTheme(properties)
   }
+}
 
-  LanternaThemes.registerTheme("zozzamas", PropertyTheme(loadPropTheme("zozzamas-theme.properties")))
+object App {
+  LanternaThemes.registerTheme("zozzamas", PropertyTheme("zozzamas-theme.properties"))
 
   val screen = TerminalScreen(DefaultTerminalFactory().createTerminal())
   screen.startScreen()
@@ -43,7 +40,7 @@ object App {
   gui.setTheme(LanternaThemes.getRegisteredTheme("zozzamas"))
 
   given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeAndWait(c), Flow.defaultBufferSize())
-  
+
   case class Model(forename: String, surname: String)
 
   enum Msg {
@@ -63,10 +60,10 @@ object App {
 
   class View()(using publisher: SubmissionPublisher[Generator[Msg]]) {
     private var model = Model("", "")
-    
+
     val panel = Panel()
     panel.setLayoutManager(new GridLayout(2))
-    
+
     val component = panel.withBorder(DynamicTitleBorder(() => model.toString))
 
     panel.addComponent(Label("Forename"))
