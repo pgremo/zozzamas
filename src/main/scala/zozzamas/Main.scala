@@ -59,12 +59,11 @@ object App {
   }
 
   class View()(using publisher: SubmissionPublisher[Generator[Msg]]) {
-    private var model = Model("", "")
-
     val panel = Panel()
     panel.setLayoutManager(new GridLayout(2))
 
-    val component = panel.withBorder(DynamicTitleBorder(() => model.toString))
+    val border: DynamicTitleBorder = DynamicTitleBorder("")
+    val component = panel.withBorder(border)
 
     panel.addComponent(Label("Forename"))
     val forename = TextBox()
@@ -80,7 +79,7 @@ object App {
     panel.addComponent(submit)
 
     def view(model: Model): Unit = {
-      this.model = model
+      border.setTitle(model.toString)
       forename.setText(model.forename)
       surname.setText(model.surname)
     }

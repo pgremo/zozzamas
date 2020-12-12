@@ -4,12 +4,14 @@ import com.googlecode.lanterna.graphics.{Theme, ThemeDefinition}
 import com.googlecode.lanterna.gui2._
 import com.googlecode.lanterna.{Symbols, TerminalPosition, TerminalSize, TerminalTextUtils}
 
-class DynamicTitleBorder(private val f: () => String) extends AbstractBorder {
-  def getTitle: String = f()
+class DynamicTitleBorder(private var title: String) extends AbstractBorder {
+  def setTitle(x: String) = title = x
+
+  def getTitle: String = title
 
   override protected def createDefaultRenderer = DynamicTitleBorderRenderer()
 
-  override def toString: String = s"${getClass.getSimpleName} {${getTitle}"
+  override def toString: String = s"${getClass.getSimpleName} {${title}"
 
 }
 
