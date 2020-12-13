@@ -19,14 +19,15 @@ import scala.language.implicitConversions
 
 object PropertyTheme {
   def apply(name: String): PropertyTheme = {
-    var stream = classOf[AbstractTextGUI].getClassLoader.getResourceAsStream(name).nn
+    val stream = classOf[AbstractTextGUI].getClassLoader.getResourceAsStream(name).nn
 
-    val properties = Properties()
-    properties.load(stream)
-
-    stream.close()
-
-    new PropertyTheme(properties)
+    try {
+      val properties = Properties()
+      properties.load(stream)
+      new PropertyTheme(properties)
+    } finally {
+      stream.close()
+    }
   }
 }
 
