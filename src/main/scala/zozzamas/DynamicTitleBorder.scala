@@ -12,7 +12,6 @@ class DynamicTitleBorder(private var title: String) extends AbstractBorder {
   override protected def createDefaultRenderer = DynamicTitleBorderRenderer()
 
   override def toString: String = s"${getClass.getSimpleName} {${title}"
-
 }
 
 private class DynamicTitleBorderRenderer extends Border.BorderRenderer {
@@ -41,52 +40,53 @@ private class DynamicTitleBorderRenderer extends Border.BorderRenderer {
     val wrappedComponent = border.getComponent
     if (wrappedComponent == null) return
 
-    val drawableArea = graphics.getSize.nn
-    val theme = component.getTheme.nn
-    val themeDefinition = theme.getDefinition(classOf[AbstractBorder]).nn
-    graphics.applyThemeStyle(themeDefinition.getNormal)
+    val area = graphics.getSize.nn
+    val theme = component.getTheme.nn.getDefinition(classOf[AbstractBorder]).nn
+    graphics.applyThemeStyle(theme.getNormal)
 
-    if (drawableArea.getRows > 2) {
-      val verticalLine = getVerticalLine(theme)
-      graphics.drawLine(new TerminalPosition(0, drawableArea.getRows - 2), new TerminalPosition(0, 1), verticalLine)
-      graphics.drawLine(new TerminalPosition(drawableArea.getColumns - 1, 1), new TerminalPosition(drawableArea.getColumns - 1, drawableArea.getRows - 2), verticalLine)
+    if (area.getRows > 2) {
+      val verticalLine = theme.getVerticalLine
+      graphics.drawLine(new TerminalPosition(0, area.getRows - 2), new TerminalPosition(0, 1), verticalLine)
+      graphics.drawLine(new TerminalPosition(area.getColumns - 1, 1), new TerminalPosition(area.getColumns - 1, area.getRows - 2), verticalLine)
     }
 
-    if (drawableArea.getColumns > 2) {
-      val horizontalLine = getHorizontalLine(theme)
-      graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.getColumns - 2, 0), horizontalLine)
-      graphics.drawLine(new TerminalPosition(1, drawableArea.getRows - 1), new TerminalPosition(drawableArea.getColumns - 2, drawableArea.getRows - 1), horizontalLine)
+    if (area.getColumns > 2) {
+      val horizontalLine = theme.getHorizontalLine
+      graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(area.getColumns - 2, 0), horizontalLine)
+      graphics.drawLine(new TerminalPosition(1, area.getRows - 1), new TerminalPosition(area.getColumns - 2, area.getRows - 1), horizontalLine)
     }
 
-    graphics.setCharacter(0, drawableArea.getRows - 1, getBottomLeftCorner(theme))
-    graphics.setCharacter(0, 0, getTopLeftCorner(theme))
-    graphics.setCharacter(drawableArea.getColumns - 1, 0, getTopRightCorner(theme))
-    graphics.setCharacter(drawableArea.getColumns - 1, drawableArea.getRows - 1, getBottomRightCorner(theme))
+    graphics.setCharacter(0, area.getRows - 1, theme.getBottomLeftCorner)
+    graphics.setCharacter(0, 0, theme.getTopLeftCorner)
+    graphics.setCharacter(area.getColumns - 1, 0, theme.getTopRightCorner)
+    graphics.setCharacter(area.getColumns - 1, area.getRows - 1, theme.getBottomRightCorner)
 
-    if (drawableArea.getColumns >= TerminalTextUtils.getColumnWidth(border.getTitle) + 4) {
-      graphics.applyThemeStyle(themeDefinition.getActive)
+    if (area.getColumns >= TerminalTextUtils.getColumnWidth(border.getTitle) + 4) {
+      graphics.applyThemeStyle(theme.getActive)
       graphics.putString(2, 0, border.getTitle)
-      graphics.applyThemeStyle(themeDefinition.getNormal)
-      graphics.setCharacter(1, 0, getTitleLeft(theme))
-      graphics.setCharacter(2 + TerminalTextUtils.getColumnWidth(border.getTitle), 0, getTitleRight(theme))
+      graphics.applyThemeStyle(theme.getNormal)
+      graphics.setCharacter(1, 0, theme.getTitleLeft)
+      graphics.setCharacter(2 + TerminalTextUtils.getColumnWidth(border.getTitle), 0, theme.getTitleRight)
     }
 
-    wrappedComponent.draw(graphics.newTextGraphics(getWrappedComponentTopLeftOffset, getWrappedComponentSize(drawableArea)))
+    wrappedComponent.draw(graphics.newTextGraphics(getWrappedComponentTopLeftOffset, getWrappedComponentSize(area)))
   }
+}
 
-  private def getTopRightCorner(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("TOP_RIGHT_CORNER", Symbols.SINGLE_LINE_TOP_RIGHT_CORNER)
+extension (t: ThemeDefinition) {
+  private def getTopRightCorner: Char = t.getCharacter("TOP_RIGHT_CORNER", Symbols.SINGLE_LINE_TOP_RIGHT_CORNER)
 
-  private def getBottomRightCorner(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("BOTTOM_RIGHT_CORNER", Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER)
+  private def getBottomRightCorner: Char = t.getCharacter("BOTTOM_RIGHT_CORNER", Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER)
 
-  private def getTopLeftCorner(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("TOP_LEFT_CORNER", Symbols.SINGLE_LINE_TOP_LEFT_CORNER)
+  private def getTopLeftCorner: Char = t.getCharacter("TOP_LEFT_CORNER", Symbols.SINGLE_LINE_TOP_LEFT_CORNER)
 
-  private def getBottomLeftCorner(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("BOTTOM_LEFT_CORNER", Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER)
+  private def getBottomLeftCorner: Char = t.getCharacter("BOTTOM_LEFT_CORNER", Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER)
 
-  private def getVerticalLine(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("VERTICAL_LINE", Symbols.SINGLE_LINE_VERTICAL)
+  private def getVerticalLine: Char = t.getCharacter("VERTICAL_LINE", Symbols.SINGLE_LINE_VERTICAL)
 
-  private def getHorizontalLine(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("HORIZONTAL_LINE", Symbols.SINGLE_LINE_HORIZONTAL)
+  private def getHorizontalLine: Char = t.getCharacter("HORIZONTAL_LINE", Symbols.SINGLE_LINE_HORIZONTAL)
 
-  private def getTitleLeft(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("TITLE_LEFT", Symbols.SINGLE_LINE_HORIZONTAL)
+  private def getTitleLeft: Char = t.getCharacter("TITLE_LEFT", Symbols.SINGLE_LINE_HORIZONTAL)
 
-  private def getTitleRight(theme: Theme): Char = theme.getDefinition(classOf[DynamicTitleBorder]).getCharacter("TITLE_RIGHT", Symbols.SINGLE_LINE_HORIZONTAL)
+  private def getTitleRight: Char = t.getCharacter("TITLE_RIGHT", Symbols.SINGLE_LINE_HORIZONTAL)
 }
