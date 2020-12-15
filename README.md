@@ -1,9 +1,13 @@
-## Roguelike Technology Experiment
+## Zozzamas
 
-### Usage
+### Development
 
-This is a normal sbt project, you can compile code with `sbt compile` and run it
-with `sbt run`, `sbt console` will start a Dotty REPL.
+Configure Dev environment
 
-For more information on the sbt-dotty plugin, see the
-[dotty-example-project](https://github.com/lampepfl/dotty-example-project/blob/master/README.md).
+* [Intall Nix](https://nixos.org/manual/nix/stable/#sect-single-user-installation)
+* ```$ nix-shell ```
+
+Building
+
+```$ sbt clean test```
+
