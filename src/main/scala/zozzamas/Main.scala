@@ -80,7 +80,7 @@ object App {
     panel.addComponent(submit)
 
     def view(model: Model): Unit = {
-      border.setTitle(model.toString)
+      border.title = model.toString
       forename.setText(model.forename)
       surname.setText(model.surname)
     }
