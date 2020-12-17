@@ -1,4 +1,4 @@
-package zozzamas
+package zozzamas.lanterna
 
 import com.googlecode.lanterna.gui2.{AbstractInteractableComponent, InteractableRenderer, TextGUIGraphics}
 import com.googlecode.lanterna.{TerminalPosition, TerminalSize, TextCharacter}

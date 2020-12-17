@@ -1,13 +1,14 @@
 package zozzamas
 
 import com.googlecode.lanterna.bundle.LanternaThemes
-import com.googlecode.lanterna.graphics.PropertyTheme
 import com.googlecode.lanterna.gui2.Button.Listener
 import com.googlecode.lanterna.gui2._
 import com.googlecode.lanterna.screen.{Screen, TerminalScreen}
 import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 import com.googlecode.lanterna.{TerminalSize, TextColor}
 import zozzamas.App.{init, update}
+import zozzamas.lanterna.{DynamicTitleBorder, PropertyTheme}
+import zozzamas.lanterna.PropertyTheme._
 
 import java.beans.{PropertyChangeListener, PropertyChangeSupport}
 import java.io.{FileInputStream, IOException, InputStream}
@@ -16,20 +17,6 @@ import java.util.concurrent.Flow.{Publisher, Subscriber}
 import java.util.concurrent.{Executor, Flow, SubmissionPublisher}
 import scala.collection.mutable
 import scala.language.implicitConversions
-
-object PropertyTheme {
-  def apply(name: String): PropertyTheme = {
-    val stream = classOf[AbstractTextGUI].getClassLoader.getResourceAsStream(name).nn
-
-    try {
-      val properties = Properties()
-      properties.load(stream)
-      new PropertyTheme(properties)
-    } finally {
-      stream.close()
-    }
-  }
-}
 
 object App {
   LanternaThemes.registerTheme("zozzamas", PropertyTheme("zozzamas-theme.properties"))

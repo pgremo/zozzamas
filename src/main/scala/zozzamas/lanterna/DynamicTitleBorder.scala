@@ -1,4 +1,4 @@
-package zozzamas
+package zozzamas.lanterna
 
 import com.googlecode.lanterna.graphics.{Theme, ThemeDefinition}
 import com.googlecode.lanterna.gui2._
@@ -34,7 +34,7 @@ private class DynamicTitleBorderRenderer extends Border.BorderRenderer {
     if (wrapped == null) return
 
     val area = graphics.getSize.nn
-    val theme = component.getTheme.nn.getDefinition(classOf[AbstractBorder]).nn
+    val theme = component.getTheme.nn.getDefinition(classOf[DynamicTitleBorder]).nn
     graphics.applyThemeStyle(theme.getNormal)
 
     if (area.getRows > 2) {
