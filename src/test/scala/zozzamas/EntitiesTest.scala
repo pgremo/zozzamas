@@ -2,7 +2,6 @@ package zozzamas
 
 import org.junit.Assert._
 import org.junit.{Assert, Test}
-import zozzamas._
 import scala.language.implicitConversions
 
 class EntitiesTest {

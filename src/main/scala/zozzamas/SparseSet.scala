@@ -12,7 +12,7 @@ class SparseSet
     with StrictOptimizedIterableOps[Int, Set, SparseSet] {
 
   private var packed = ArrayBuffer[Int]()
-  private var sparse = Array[Int | Null]()
+  private var sparse = Array[Integer]()
 
   override def addOne(key: Int) = {
     sparse = key match {
@@ -46,7 +46,7 @@ class SparseSet
 
   override def clear(): Unit = {
     packed = ArrayBuffer[Int]()
-    sparse = Array[Int | Null]()
+    sparse = Array[Integer]()
   }
 
   override def iterator = packed.iterator

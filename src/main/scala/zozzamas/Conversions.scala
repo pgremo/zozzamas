@@ -7,6 +7,6 @@ given Conversion[() => Any, Runnable] = f => new Runnable {
 }
 
 given Conversion[Runnable => Unit, Executor] = f => new Executor {
-  override def execute(command: Runnable | UncheckedNull): Unit = f(command.nn)
+  override def execute(command: Runnable): Unit = f(command.nn)
 }
 

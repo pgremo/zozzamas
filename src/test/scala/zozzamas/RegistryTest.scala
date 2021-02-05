@@ -8,10 +8,10 @@ import scala.collection.mutable.{HashMap, Map}
 
 type Storage[X] = Map[Entity, X]
 
-given intItems as Storage[Int] = SparseMap[Int]()
-given stringItems as Storage[String] = SparseMap[String]()
-given dateItems as Storage[Date] = SparseMap[Date]()
-given longItems as Storage[Long] = SparseMap[Long]()
+given intItems : Storage[Int] = SparseMap[Int]()
+given stringItems : Storage[String] = SparseMap[String]()
+given dateItems : Storage[Date] = SparseMap[Date]()
+given longItems : Storage[Long] = SparseMap[Long]()
 
 def printThem()(using ints: Storage[Int], strings: Storage[String], dates: Storage[Date]) = {
   val count = (for (

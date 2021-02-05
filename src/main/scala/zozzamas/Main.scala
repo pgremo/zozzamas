@@ -27,7 +27,7 @@ object App {
   val gui = MultiWindowTextGUI(screen, DefaultWindowManager(), EmptySpace(TextColor.ANSI.BLACK))
   gui.setTheme(LanternaThemes.getRegisteredTheme("zozzamas"))
 
-  given publisher as SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeAndWait(c), Flow.defaultBufferSize())
+  given publisher : SubmissionPublisher[Generator[Msg]] = SubmissionPublisher[Generator[Msg]](c => gui.getGUIThread().nn.invokeAndWait(c), Flow.defaultBufferSize())
 
   case class Model(forename: String, surname: String)
 
@@ -42,7 +42,7 @@ object App {
   def update(msg: Msg, model: Model): (Model, Cmd[Msg]) = {
     msg match {
       case Msg.NameCreated(forename, surname) => (Model(surname, forename), Cmd.None)
-      case _ => (model, Cmd.None)
+      case null => (model, Cmd.None)
     }
   }
 

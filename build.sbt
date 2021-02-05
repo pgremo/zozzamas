@@ -16,10 +16,9 @@ lazy val root = project
     name := "zozzamas",
     version := sys.env.getOrElse("SPECIFICATION_VERSION", "0.1.0"),
 
-    scalaVersion := "3.0.0-M2",
+    scalaVersion := "3.0.0-M3",
 
     scalacOptions ++= Seq(
-      "-Yexplicit-nulls",
       "-Ycheck-init",
       "-Xfatal-warnings",
       "-deprecation",

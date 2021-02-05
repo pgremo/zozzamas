@@ -11,7 +11,7 @@ class DynamicTitleBorder(var title: String) extends AbstractBorder {
 private class DynamicTitleBorderRenderer extends Border.BorderRenderer {
   val TWO = TerminalSize(2, 2)
 
-  override def getPreferredSize(component: Border | UncheckedNull): TerminalSize | UncheckedNull = {
+  override def getPreferredSize(component: Border): TerminalSize = {
     val border = component.asInstanceOf[DynamicTitleBorder]
     val wrapped = border.getComponent
     val title = border.title
@@ -24,17 +24,17 @@ private class DynamicTitleBorderRenderer extends Border.BorderRenderer {
     else preferredSize.max(TerminalSize(TerminalTextUtils.getColumnWidth(title) + 4, 2))
   }
 
-  override def getWrappedComponentTopLeftOffset: TerminalPosition | UncheckedNull = TerminalPosition.OFFSET_1x1
+  override def getWrappedComponentTopLeftOffset: TerminalPosition = TerminalPosition.OFFSET_1x1
 
-  override def getWrappedComponentSize(borderSize: TerminalSize | UncheckedNull): TerminalSize | UncheckedNull = borderSize.withRelative(-Math.min(2, borderSize.getColumns), -Math.min(2, borderSize.getRows));
+  override def getWrappedComponentSize(borderSize: TerminalSize): TerminalSize = borderSize.withRelative(-Math.min(2, borderSize.getColumns), -Math.min(2, borderSize.getRows));
 
-  override def drawComponent(graphics: TextGUIGraphics | UncheckedNull, component: Border | UncheckedNull): Unit = {
+  override def drawComponent(graphics: TextGUIGraphics, component: Border): Unit = {
     val border = component.asInstanceOf[DynamicTitleBorder]
     val wrapped = border.getComponent
     if (wrapped == null) return
 
-    val area = graphics.getSize.nn
-    val theme = component.getTheme.nn.getDefinition(classOf[DynamicTitleBorder]).nn
+    val area = graphics.getSize
+    val theme = component.getTheme.getDefinition(classOf[DynamicTitleBorder])
     graphics.applyThemeStyle(theme.getNormal)
 
     if (area.getRows > 2) {

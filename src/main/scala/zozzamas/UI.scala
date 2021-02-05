@@ -19,14 +19,14 @@ def initialize[M, D](
   var (model, command) = init()
 
   emitter.subscribe(new Subscriber[Generator[M]] {
-    var sub: Flow.Subscription | Null = null
+    var sub: Flow.Subscription = null
 
-    def onSubscribe(subscription: Flow.Subscription | UncheckedNull): Unit = {
+    def onSubscribe(subscription: Flow.Subscription): Unit = {
       sub = subscription
-      sub.nn.request(1)
+      sub.request(1)
     }
 
-    def onNext(item: Generator[M] | UncheckedNull): Unit = {
+    def onNext(item: Generator[M]): Unit = {
       sub.nn.request(1)
       val (a, b) = update(item(), model)
       model = a
@@ -35,7 +35,7 @@ def initialize[M, D](
       command.foreach(emitter.submit)
     }
 
-    def onError(throwable: Throwable | UncheckedNull): Unit = {}
+    def onError(throwable: Throwable): Unit = {}
 
     def onComplete(): Unit = {}
   })
