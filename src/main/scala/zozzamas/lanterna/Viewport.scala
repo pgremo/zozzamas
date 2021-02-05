@@ -7,10 +7,9 @@ class Viewport extends AbstractInteractableComponent[Viewport] {
   override def createDefaultRenderer: InteractableRenderer[Viewport] = new InteractableRenderer[Viewport] {
     override def getCursorLocation(component: Viewport): TerminalPosition | Null = null
 
-    override def getPreferredSize(component: Viewport ): TerminalSize = TerminalSize(3, 3)
+    override def getPreferredSize(component: Viewport): TerminalSize = TerminalSize(3, 3)
 
-    override def drawComponent(graphics: TextGUIGraphics, component: Viewport): Unit = {
-      graphics.fillRectangle(TerminalPosition.TOP_LEFT_CORNER, graphics.getSize(), TextCharacter('X'))
-    }
+    override def drawComponent(graphics: TextGUIGraphics, component: Viewport): Unit =
+      graphics.fillRectangle(TerminalPosition.TOP_LEFT_CORNER, graphics.getSize(), 'X')
   }
 }
